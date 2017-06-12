@@ -23,6 +23,11 @@ class TestPermission:
     ADMINISTRATOR = 0xF
 
 
+class SurveyPageType:
+    MASTERPAGE = 'master'
+    SUBPAGE = 'sub'
+
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -199,7 +204,39 @@ class SurveyMeta(db.Model):
         return '<SurveyMeta {}: {}>'.format(self.survey_id, self.meta_key)
 
 
+class SurveyPage(db.Model):
+    __tablename__ = 'survey_pages'
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(64))
+    slug = db.Column(db.String(255), index=True)
+    ordering = db.Column(db.Integer, default=0)
+    body = db.Column(db.Text)
+    body_html = db.Column(db.Text)
+    ctime = db.Column(db.DateTime, default=datetime.now())
+    survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
+
+    survey = db.relationship('Survey',
+                            backref = db.backref('survey_pages', lazy='dynamic')
+                            )
+
+    def __repr__(self):
+        return '<SurveyPage {}: {}'.format(self.survey_id, self.slug)
+
+
 class SurveyResult(db.Model):
     __tablename__ = 'survey_results'
     id = db.Column(db.Integer, primary_key=True)
+    result = db.Column(db.Text)
+    ctime = db.Column(db.DateTime, default=datetime.now())
+    uptime = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User',
+                           backref = db.backref('results', lazy='dynamic')
+                          )
+    survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
+    survey = db.relationship('Survey',
+                            backref = db.backref('results', lazy='dynamic')
+                            )
 
+    def __repr__(self):
+        return '<SurveyResult {} {}'.format(self.user_id, self.survey_id)
