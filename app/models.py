@@ -259,6 +259,7 @@ class SurveyMeta(db.Model):
     meta_key = db.Column(db.String(250), index=True)
     meta_value = db.Column(db.Text)
     ctime = db.Column(db.DateTime, default=datetime.now())
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
 
     survey = db.relationship('Survey',
