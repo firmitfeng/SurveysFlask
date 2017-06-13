@@ -1,0 +1,25 @@
+{% extends "manage/base.html" %}
+{% import "manage/form_macro.html" as form_macro %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block main_body %}
+<form action="" method="post" class="form form-horizontal" role="form" enctype="multipart/form-data">
+  {{ form.hidden_tag() }}
+
+  {%- if form.errors %}
+    {%- for fieldname, errors in form.errors.items() %}
+      {%- if bootstrap_is_hidden_field(form[fieldname]) %}
+        {%- for error in errors %}
+          <p class="error">{{error}}</p>
+        {%- endfor %}
+      {%- endif %}
+    {%- endfor %}
+  {%- endif %}
+
+  {{ form_macro.form_field(form.old_passwd, form_type="horizontal", horizontal_columns=('lg', 1, 10)) }}
+  {{ form_macro.form_field(form.new_passwd, form_type="horizontal", horizontal_columns=('lg', 1, 10)) }}
+  {{ form_macro.form_field(form.re_passwd, form_type="horizontal", horizontal_columns=('lg', 1, 10)) }}
+  {{ form_macro.form_field(form.submit, form_type="horizontal", horizontal_columns=('lg', 1, 2), button_map={'submit':'primary btn-lg btn-block'}) }}
+</form>
+{% endblock %}
+

@@ -12,5 +12,5 @@ manage = Blueprint(
 
 
 #import views
-from . import views, errors
+from . import views, user, survey, errors
 

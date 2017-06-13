@@ -1,0 +1,58 @@
+{% extends "manage/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "main/_macros.html" as macros %}
+
+{% block main_body %}
+<table class="table table-condensed table-striped table-hover row">
+  <thead>
+    <tr>
+      <th width="25px">#</th>
+      <th>问卷名称</th>
+      <th class="col-md-1">作者</th>
+      <th class="col-md-1">最后修改时间</th>
+      <th class="col-md-2">操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for survey in surveys %}
+    <tr survey_id={{survey.id}}>
+      <td></td>
+      <td><span title="{{survey.title}}">{{survey.title | truncate(35, True)}}</span></td>
+      <td>{{survey.author.name}}</td>
+      <td>{{survey.uptime.strftime('%Y-%m-%d')}}</td>
+      <td>
+          <a href="{{ url_for('manage.editSurvey', survey_id=survey.id) }}" class="btn btn-default btn-sm" role="button">编辑</a>
+          <a href="#" url-target="{{ url_for('manage.delSurvey', survey_id=survey.id) }}" class="delete btn btn-default btn-sm" role="button">删除</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="center-block margin-blank-5">
+  {{ macros.pagination_widget(pagination, 'manage.listSurvey') }}
+</div>
+
+{% include 'manage/modal.html' %} 
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+jQuery( document ).ready(function(){
+  jQuery('a.delete').each(function(){
+    jQuery(this).click(function(){
+        var url = jQuery(this).attr("url-target");
+        jQuery('div.modal-body').empty().html('<p><strong>此操作无法恢复！确定删除？</strong></p>');
+        jQuery('div.modal-content').addClass('alert alert-danger');
+        jQuery('div.modal-footer #subBtn').addClass('btn-danger').click(function(){
+          window.location.href=url;
+          //console.log(url);
+        });
+        jQuery('div#infoModal').modal('show');
+    });
+  });
+}); 
+</script>
+{% endblock %}

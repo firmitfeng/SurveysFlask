@@ -1,0 +1,22 @@
+{% extends "manage/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}网站管理 - 北京大学心理与认知科学学院{% endblock %}
+
+{% block content_attribs %} class="container" {% endblock %}
+
+{% block page_content %}
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  {{ message }}
+</div>
+{% endfor %}
+
+<div class="col-md-offset-1 col-md-6">
+  <div class="page-header">
+    <h1>登录</h1>
+  </div>
+  {{ wtf.quick_form(form, form_type='horizontal') }}
+</div>
+{% endblock %}
