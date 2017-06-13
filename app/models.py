@@ -14,7 +14,7 @@ from utils.libserialnum import encodeSerialNum, decodeSerialNum
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
 
-class TestPermission:
+class SurveyPernission:
     NONE = 0x0
     READ = 0x1
     CREATE = 0x2
@@ -23,26 +23,44 @@ class TestPermission:
     ADMINISTRATOR = 0xF
 
 
+class SurveyStatus:
+    PUB = 0x8
+    CHECK = 0x2
+    DELETE = 0x0
+
+
 class SurveyPageType:
     MASTERPAGE = 'master'
     SUBPAGE = 'sub'
+
+
+class RelationType:
+    VISIT = 'visitor_psycho'
+    SUPERVISE = 'psycho_super'
+
+
+class OwnerType:
+    VISITOR = 'visitor'
+    PSYCHO = 'psycho'
+    SUPER = 'supervisor'
+    OWNER = 'owner'
 
 
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
-    default = db.Column(db.Boolean, default=False, index=True)
-    permissions = db.Column(db.Integer, default=0x0)
-    users = db.relationship('User', backref='role', lazy='dynamic')
+    default = db.Column(db.Boolean, default=False)
+    permissions = db.Column(db.Integer, default=SurveyPernission.NONE)
+    users = db.relationship('User', backref='role', lazy="dynamic")
 
     @staticmethod
     def insert_role():
         roles = {
-            'visitor': (TestPermission.READ, True),
-            'psycho': (TestPermission.CREATE, False),
-            'censor': (TestPermission.READ, False),
-            'administrator': (-1, false)
+            'visitor': (SurveyPernission.READ, True),
+            'psycho': (SurveyPernission.CREATE, False),
+            'supervisor': (SurveyPernission.READ, False),
+            'administrator': (-1, False)
         }
         for r in roles:
             role = Role.query.filter_by(name=r).first()
@@ -57,16 +75,58 @@ class Role(db.Model):
         return '<Role {}>'.format(self.name)
 
 
+class Relation(db.Model):
+    ''' 定义用户之间的从属关系  '''
+    __tablename__ = 'relations'
+    #id = db.Column(db.Integer, primary_key=True)
+    #被监管人的ID
+    lower_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    #管理员的ID
+    upper_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    type = db.Column(db.String(64))
+    ctime = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<upper id %r, lower id %r>' % \
+                   (self.upper_id, self.lower_id)
+
+
+class Distribute(db.Model):
+    '''  定义用户和问卷之间的分配关系  '''
+    __tablename__ = 'distribute'
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'), primary_key=True)
+    type = db.Column(db.String(64))
+    ctime = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<survey: {}, user: {}>'.format(self.survey_id, self.user_id)
+
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True, index=True)
+    name = db.Column(db.String(32), unique=True, index=True)
     email = db.Column(db.String(128), unique=True, index=True)
-    phone = db.Column(db.String(24))
+    #phone = db.Column(db.String(24))
     password_hash = db.Column(db.String(128))
-    last_login_ip = db.Column(db.String(64))
+    last_login_ip = db.Column(db.String(32))
     last_login_time = db.Column(db.DateTime, default=datetime.now())
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    upper = db.relationship('Relation', foreign_keys=[Relation.lower_id],
+                            backref=db.backref('lower', lazy='joined'),
+                            lazy='dynamic')
+
+    lower = db.relationship('Relation', foreign_keys=[Relation.upper_id],
+                            backref=db.backref('upper', lazy='joined'),
+                            lazy='dynamic')
+                            #cascade='all, delete-orphan'
+                            #)
+
+    own_surveys = db.relationship('Distribute', foreign_keys=[Distribute.user_id],
+                              backref=db.backref('owner', lazy='joined'),
+                              lazy='dynamic')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -155,7 +215,7 @@ class UserMeta(db.Model):
     ctime = db.Column(db.DateTime, default=datetime.now())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    owner = db.relationship('User',
+    user = db.relationship('User',
                             backref = db.backref('user_metas', lazy='dynamic')
                             )
 
@@ -167,14 +227,19 @@ class Survey(db.Model):
     __tablename__ = 'surveys'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255))
-    slug = db.Column(db.String(2000), index=True)
+    slug = db.Column(db.String(1000), index=True)
     description = db.Column(db.Text)
+    status = db.Column(db.Integer, default=SurveyStatus.CHECK)
     ctime = db.Column(db.DateTime, default=datetime.now())
     uptime = db.Column(db.DateTime)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author = db.relationship('User',
-                            backref = db.backref('surveys', lazy='dynamic')
+                            backref = db.backref('created_surveys', lazy='joined')
                             )
+
+    owner = db.relationship('Distribute', foreign_keys=[Distribute.survey_id],
+                            backref=db.backref('survey', lazy='joined'),
+                            lazy='dynamic')
 
     @staticmethod
     def on_changed_title(target, value, oldvalue, initiator):
@@ -207,7 +272,7 @@ class SurveyMeta(db.Model):
 class SurveyPage(db.Model):
     __tablename__ = 'survey_pages'
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(64))
+    type = db.Column(db.String(32), default=SurveyPageType.MASTERPAGE)
     slug = db.Column(db.String(255), index=True)
     ordering = db.Column(db.Integer, default=0)
     body = db.Column(db.Text)
@@ -240,3 +305,5 @@ class SurveyResult(db.Model):
 
     def __repr__(self):
         return '<SurveyResult {} {}'.format(self.user_id, self.survey_id)
+
+
