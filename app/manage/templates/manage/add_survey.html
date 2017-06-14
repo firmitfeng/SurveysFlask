@@ -17,19 +17,9 @@
   {%- endif %}
 
   {{ form_macro.form_field(form.title, form_type="horizontal", horizontal_columns=('lg', 1, 10)) }}
-  {{ form_macro.form_field(form.content, form_type="horizontal", horizontal_columns=('lg', 1, 10), class='form-control ckeditor') }}
+  {{ form_macro.form_field(form.content, form_type="horizontal", horizontal_columns=('lg', 1, 10)) }}
   {{ form_macro.form_field(form.describe, form_type="horizontal", horizontal_columns=('lg', 1, 10)) }}
   {{ form_macro.form_field(form.submit, form_type="horizontal", horizontal_columns=('lg', 1, 2), button_map={'submit':'primary btn-lg btn-block'}) }}
 </form>
 {% endblock %}
 
-{% block scripts %}
-{{ super() }}
-  <script src="{{ url_for('manage.static', filename='js/ckeditor/ckeditor.js') }}"></script>
-  <script>
-    CKEDITOR.replace('content', {
-                    filebrowserUploadUrl: '/manage/uploadfile/data/',
-                    filebrowserImageUploadUrl: '/manage/uploadfile/img/'
-                });
-  </script>
-{% endblock %}

@@ -45,6 +45,18 @@ the necessary fix for required=False attributes, but will also not set the requi
       </div>
     {% endfor %}
   {% endcall %}
+{%- elif field.type == 'LabelRadioField' -%}
+  {# fenghao add this to heck display label on RadioField #}
+  <div class="form-group label-radio {% if required %} required{% endif %}">
+    <p>{{ field.label.text|safe}}</p>
+    {% for item in field -%}
+      <div class="radio {{form_type}}">
+        <label>
+          {{item|safe}} {{item.label.text|safe}}
+        </label>
+      </div>
+    {% endfor %}
+  </div>
 {%- elif field.type == 'PicRadioField' -%}
   {# note: A cleaner solution would be rendering depending on the widget,
      this is just a hack for now, until I can think of something better #}
@@ -100,9 +112,6 @@ the necessary fix for required=False attributes, but will also not set the requi
         <div class=" col-{{horizontal_columns[0]}}-{{horizontal_columns[2]}}">
           {% if field.type == 'FileField' %}
             {{field(**kwargs)|safe}}
-          {# fenghao hack this to display radio with label #}  
-          {% elif field.type == 'RadioLableFiled' %}
-            {{field(class="form-control list-inline category", **kwargs)|safe}} 
           {% else %}
             {{field(class="form-control", **kwargs)|safe}}
           {% endif %}

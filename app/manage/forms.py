@@ -43,7 +43,6 @@ class ChangePasswordForm(Form):
 
 
 class SurveyBaseForm(Form):
-    submit = SubmitField(u'提交')
 
     @classmethod
     def append_field(cls, name, field):
@@ -57,5 +56,5 @@ class addSurveyForm(SurveyBaseForm):
     content = TextAreaField(u'内容', widget=TextArea(), \
                             render_kw={'class': 'text-body', 'rows': 20})
     describe = StringField(u'说明')
-
+    submit = SubmitField(u'提交')
 

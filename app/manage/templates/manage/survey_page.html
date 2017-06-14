@@ -1,0 +1,28 @@
+{% import "manage/form_macro.html" as form_macro %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+<div class="survey_page">
+  <div class="survey_info">
+    {{info}}
+  <div>
+  <form action="" method="post" class="form form-horizontal" role="form">
+    {{ form.hidden_tag() }}
+
+    {%- if form.errors %}
+      {%- for fieldname, errors in form.errors.items() %}
+        {%- if bootstrap_is_hidden_field(form[fieldname]) %}
+          {%- for error in errors %}
+            <p class="error">{{error}}</p>
+          {%- endfor %}
+        {%- endif %}
+      {%- endfor %}
+    {%- endif %}
+
+    {%- for field in form %}
+      {% if not bootstrap_is_hidden_field(field) -%}
+        {{ form_macro.form_field(field, form_type="inline", horizontal_columns=('lg', 0, 12), class="form-control survey-item")}}
+      {%- endif %}
+    {%- endfor %}
+    <button type="submit" class="btn btn-default">提交</button>
+  </form>
+</div>

@@ -1,0 +1,15 @@
+.label-radio p {
+  margin: 0;
+  font-weight: bold;
+}
+
+.label-radio .inline {
+  display: inline-block;
+}
+
+.label-radio {
+  margin: 5px 0;
+  padding: 5px;
+  background: #EEE;
+  border-radius: 5px;
+}
