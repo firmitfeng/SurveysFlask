@@ -1,0 +1,42 @@
+{% extends "main/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "manage/form_macro.html" as form_macro %}
+
+{% block content_attribs %} class="container" {% endblock %}
+
+{% block page_content %}
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  {{ message }}
+</div>
+{% endfor %}
+
+<div class="col-md-offset-2 col-md-7">
+  <div class="page-header">
+    <h1>注册</h1>
+  </div>
+<form action="" method="post" class="form form-horizontal" role="form">
+  {{ form.hidden_tag() }}
+
+  {%- if form.errors %}
+    {%- for fieldname, errors in form.errors.items() %}
+      {%- if bootstrap_is_hidden_field(form[fieldname]) %}
+        {%-  for error in errors %}
+          <p class="error">{{error}}</p>
+        {%- endfor %}
+      {%- endif %}
+    {%- endfor %}
+  {%- endif %}
+
+  {{ form_macro.form_field(form.name, form_type="horizontal", horizontal_columns=('lg', 2, 10)) }}
+  {{ form_macro.form_field(form.email, form_type="horizontal", horizontal_columns=('lg', 2, 10)) }}
+  {{ form_macro.form_field(form.password, form_type="horizontal", horizontal_columns=('lg', 2, 10)) }}
+  {{ form_macro.form_field(form.re_passwd, form_type="horizontal", horizontal_columns=('lg', 2, 10)) }}
+  <div class="col-lg-offset-2 col-lg-10">
+    <input class="btn btn-primary" id="submit" name="submit" type="submit" value="注册">
+    <a href=" {{url_for('main.index')}}" class="btn btn-default" role="button">返回</a>
+  </div>
+</form>
+</div>
+{% endblock %}

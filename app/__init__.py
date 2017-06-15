@@ -16,7 +16,7 @@ csrf = CsrfProtect()
 
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
-login_manager.login_view = 'manage.login'
+login_manager.login_view = 'main.login'
 
 
 def create_app(config_name):

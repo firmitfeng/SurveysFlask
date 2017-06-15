@@ -1,0 +1,39 @@
+@charset "utf-8";
+/* CSS Document */
+#mask{
+	margin:0;
+	padding:0;
+	position:absolute;
+	left:0;
+	top:0;
+	width:100%;
+	height:100%;
+	background-color:#999;
+	z-index:9999;
+	FILTER: alpha(opacity=50);
+}
+#ie6tips{
+	margin:0;
+	padding:0;
+	position:absolute;
+	left:50%;
+	top:0;
+	margin-left:-300px;
+	width:600px;
+	height:350px;
+	background-color:#fff;
+	z-index:10000;
+	display:block;
+}
+#ie6tips .modal-header h3{
+	line-height:40px;
+}
+#ie6tips #ie6tipsClose{
+	float:right;
+}
+#ie6tips .modal-body{
+	height:140px;
+}
+#ie6tips .modal-footer{
+	height:30px;
+}

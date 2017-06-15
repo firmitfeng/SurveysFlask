@@ -17,13 +17,54 @@ from app.models import SurveyPernission, SurveyStatus, SurveyPageType, \
         Role, User, UserMeta, \
         Survey, SurveyMeta, SurveyPage, SurveyResult, \
         Relation, Distribute
-
+from forms import LoginForm, RegForm
 
 
 
 @main.route('/')
 @login_required
 def index():
+    if current_user.role != Role.query.filter_by(name='visitor').first():
+        return redirect(url_for('manage.index'))
     return "main page"
 
 
+@main.route('/login', methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is not None and user.verify_password(form.password.data):
+            user.ping()
+            login_user(user, form.remember_me.data)
+            return redirect(request.args.get('next') or url_for('main.index'))
+        flash(u'用户名或密码错误')
+    return render_template('main/login.html', form=form)
+
+
+@main.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    # flash(u'您已经退出')
+    return redirect(url_for('main.index'))
+
+
+@main.route('/reg', methods=["GET", "POST"])
+def register():
+    form = RegForm()
+    if form.validate_on_submit():
+        if form.password.data == form.re_passwd.data and\
+                len(form.password.data) > 7:
+            user = User(
+                        name=form.name.data,
+                        password=form.password.data,
+                        email=form.email.data
+                        )
+            db.session.add(user)
+            db.session.commit()
+            flash(u'操作成功')
+            return redirect(url_for('main.index'))
+        else:
+            flash(u'密码过短或两次输入不同')
+    return render_template('main/reg.html', form=form)

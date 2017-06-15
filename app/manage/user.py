@@ -68,7 +68,7 @@ def addUser():
                                 meta_value=json.dumps({
                                                     'name': user.name,
                                                     'role': user.role.name,
-                                                    'operator_id': current_user.id
+                                                    'operator': current_user.name
                                                   }),
                                 user=user
                                 )
