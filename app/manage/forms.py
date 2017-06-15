@@ -9,6 +9,7 @@ from wtforms.validators import InputRequired, Length, Email, Regexp, EqualTo, Da
 from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from datetime import datetime
+from app.models import Role
 
 
 #class CheckboxSelectField(QuerySelectMultipleField):
@@ -42,6 +43,38 @@ class ChangePasswordForm(Form):
     submit = SubmitField(u'提交')
 
 
+def getRoles():
+    return Role.query
+
+
+class addUserForm(Form):
+    name = StringField(u'用户名', validators=[DataRequired()],
+                        render_kw={'placeholder': u'请输入用户名'})
+    email = StringField(u'电子邮件', \
+                validators=[DataRequired(), Length(1,100), Email()],
+                render_kw={'placeholder': u'请输入电子邮件'})
+    password = PasswordField(u'密码', \
+                    validators=[DataRequired(), Length(8,32)],\
+                    render_kw={'placeholder': u'请输入密码，长度8-32位'})
+    re_passwd = PasswordField(u'重复密码', \
+                    validators=[EqualTo('password', message='两次输入的密码不同')],\
+                    render_kw={'placeholder': u'请再次输入密码'})
+    role = QuerySelectField(u'角色', query_factory=getRoles,
+                            get_pk=lambda r: r.id, get_label='name')
+
+    submit = SubmitField(u'提交')
+
+
+class editUserForm(addUserForm):
+    password = PasswordField(u'密码', \
+                    #validators=[Length(8,32)],\
+                    render_kw={'placeholder': u'请输入密码，不修改请留空'})
+    re_passwd = PasswordField(u'重复密码', \
+                    validators=[EqualTo('password', message='两次输入的密码不同')],\
+                    render_kw={'placeholder': u'请再次输入密码'})
+    user_id = HiddenField(u'user_id')
+
+
 class SurveyBaseForm(Form):
 
     @classmethod
@@ -58,3 +91,6 @@ class addSurveyForm(SurveyBaseForm):
     describe = StringField(u'说明')
     submit = SubmitField(u'提交')
 
+
+class editSurveyForm(addSurveyForm):
+    survey_id = HiddenField(u'survey_id')

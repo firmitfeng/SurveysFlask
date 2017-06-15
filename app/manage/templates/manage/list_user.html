@@ -7,24 +7,24 @@
   <thead>
     <tr>
       <th width="25px">#</th>
-      <th>问卷名称</th>
-      <th class="col-md-1">作者</th>
-      <th class="col-md-1">最后修改时间</th>
+      <th class="col-md-1">用户名</th>
+      <th >电子邮件</th>
+      <th class="col-md-1">角色</th>
+      <th class="col-md-1">最后登录时间</th>
       <th class="col-md-2">操作</th>
     </tr>
   </thead>
   <tbody>
-    {% for survey in surveys %}
-    <tr survey_id={{survey.id}}>
+    {% for user in users %}
+    <tr user_id={{user.id}}>
       <td></td>
-      <td><span title="{{survey.title}}">{{survey.title | truncate(35, True)}}</span></td>
-      {#<br><span >{{survey.description}}</span></td>#}
-      <td>{{survey.author.name}}</td>
-      <td>{{survey.uptime.strftime('%Y-%m-%d')}}</td>
+      <td>{{user.name}}</td>
+      <td>{{user.email}}</td>
+      <td>{{user.role.name}}</td>
+      <td>{{user.last_login_time.strftime('%Y-%m-%d')}}</td>
       <td>
-          <a href="{{ url_for('manage.editSurvey', survey_id=survey.id) }}" class="btn btn-default btn-sm" role="button">编辑</a>
-          <a href="{{ url_for('manage.previewSurvey', survey_id=survey.id) }}" class="btn btn-default btn-sm" target="_blank" role="button">预览</a>
-          <a href="#" url-target="{{ url_for('manage.delSurvey', survey_id=survey.id) }}" class="delete btn btn-default btn-sm" role="button">删除</a>
+          <a href="{{ url_for('manage.editUser', user_id=user.id) }}" class="btn btn-default btn-sm" role="button">编辑</a>
+          <a href="#" url-target="{{ url_for('manage.delUser', user_id=user.id) }}" class="delete btn btn-default btn-sm" role="button">删除</a>
       </td>
     </tr>
     {% endfor %}
@@ -32,7 +32,7 @@
 </table>
 
 <div class="center-block margin-blank-5">
-  {{ macros.pagination_widget(pagination, 'manage.listSurvey') }}
+  {{ macros.pagination_widget(pagination, 'manage.listUser') }}
 </div>
 
 {% include 'manage/modal.html' %} 

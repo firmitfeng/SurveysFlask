@@ -3,7 +3,7 @@
 
 <div class="survey_page">
   <div class="survey_info">
-    {{info}}
+      {%- if info %}{{info}}{% endif -%}
   <div>
   <form action="" method="post" class="form form-horizontal" role="form">
     {{ form.hidden_tag() }}

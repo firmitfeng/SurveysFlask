@@ -23,10 +23,10 @@
     <div id="userManage" class="panel-collapse collapse {% if userManage %}in{% endif -%}" role="tabpanel" aria-labelledby="userManageHead">
       <div class="panel-body">
         <ul class="nav">
-          <li><a href="#">用户列表</a></li>
-          <li><a href="#">添加用户</a></li>
-          <li><a href="#">分配咨询师</a></li>
-          <li><a href="#">分配督导师</a></li>
+          <li><a href="{{ url_for('manage.listUser') }}">用户列表</a></li>
+          <li><a href="{{ url_for('manage.addUser') }}">添加用户</a></li>
+          <li><a href="{{ url_for('manage.distributeUser', target='visitor') }}">分配咨询师</a></li>
+          <li><a href="{{ url_for('manage.distributeUser', target='psycho') }}">分配督导师</a></li>
         </ul>
       </div>
     </div>

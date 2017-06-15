@@ -248,7 +248,7 @@ class Survey(db.Model):
         target.slug = target.slug.replace(u' ', u'-')
 
     def __repr__(self):
-        return '<Survey {}'.format(self.title)
+        return '<Survey {}>'.format(self.title)
 
 db.event.listen(Survey.title, 'set', Survey.on_changed_title)
 
@@ -263,7 +263,7 @@ class SurveyMeta(db.Model):
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
 
     survey = db.relationship('Survey',
-                            backref = db.backref('survey_metas', lazy='dynamic')
+                            backref = db.backref('metas', lazy='dynamic')
                             )
 
     def __repr__(self):

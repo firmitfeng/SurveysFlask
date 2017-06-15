@@ -34,7 +34,11 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None and user.verify_password(form.password.data):
+            user.ping()
             login_user(user, form.remember_me.data)
+            role_vist = Role.query.filter_by(name='visitor').first()
+            if user.role == role_vist:
+                return redirect(request.args.get('next') or url_for('main.index'))
             return redirect(request.args.get('next') or url_for('manage.index'))
         flash(u'用户名或密码错误')
     return render_template('manage/login.html', form=form)
@@ -68,7 +72,8 @@ def ChangePasswd():
             return redirect(url_for('manage.index'))
         else:
             flash(u'密码错误')
-    return render_template('manage/change_passwd.html',\
-                    form=form, userInfo='active')
+    return render_template('manage/change_passwd.html',
+                            pagetitle=u'修改密码',
+                            form=form, userInfo='active')
 
 
