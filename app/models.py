@@ -46,6 +46,11 @@ class OwnerType:
     OWNER = 'owner'
 
 
+class MesgType:
+    SYSTEM = 'system'
+    USER = 'user'
+
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -229,6 +234,8 @@ class Survey(db.Model):
     title = db.Column(db.String(255))
     slug = db.Column(db.String(1000), index=True)
     description = db.Column(db.Text)
+    content_origin = db.Column(db.Text)
+    dimension = db.Column(db.Text)
     status = db.Column(db.Integer, default=SurveyStatus.CHECK)
     ctime = db.Column(db.DateTime, default=datetime.now())
     uptime = db.Column(db.DateTime)
@@ -308,3 +315,34 @@ class SurveyResult(db.Model):
         return '<SurveyResult {} {}'.format(self.user_id, self.survey_id)
 
 
+class Message(db.Model):
+    __tablename__ = 'messages'
+    id = db.Column(db.Integer, primary_key=True)
+    subject = db.Column(db.String(255))
+    content = db.Column(db.Text)
+    type = db.Column(db.String(64))
+    is_read = db.Column(db.SmallInteger, default=0)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    sender = db.relationship('User',
+                            primaryjoin = "Message.sender_id == User.id",
+                            backref=db.backref("message_sended", lazy='dynamic')
+                            )
+    receiver = db.relationship('User',
+                              primaryjoin = "Message.receiver_id == User.id",
+                              backref=db.backref("message_received", lazy='dynamic')
+                              )
+    #root_id = db.Column(db.Integer, db.ForeignKey('messages.id'))
+    #root = db.relationship('Message',
+    #                        remote_side=[id],
+    #                        backref=db.backref('leafs', remote_side=[root_id], lazy='dynamic')
+    #                        )
+    parent_id = db.Column(db.Integer, db.ForeignKey('messages.id'))
+    children = db.relationship('Message',
+                                backref=db.backref('parent', remote_side=[id]),
+                                lazy='dynamic'
+                              )
+   
+    def __repr__(self):
+        return '<Message sender:{} receiver:{} subject:{}>'\
+                    .format(self.sender_id, self.receiver_id, self.subject)

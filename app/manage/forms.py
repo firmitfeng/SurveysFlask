@@ -10,6 +10,7 @@ from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from datetime import datetime
 from app.models import Role
+from utils.libform import MultiCheckboxField
 
 
 #class CheckboxSelectField(QuerySelectMultipleField):
@@ -17,10 +18,6 @@ class CheckboxSelectField(QuerySelectField):
     widget = ListWidget(prefix_label=False)
     #option_widget = CheckboxInput()
     option_widget = RadioInput()
-
-
-class PicRadioField(RadioField):
-    pass
 
 
 class ChangePasswordForm(Form):
@@ -68,7 +65,6 @@ class editUserForm(addUserForm):
 
 
 class SurveyBaseForm(Form):
-
     @classmethod
     def append_field(cls, name, field):
         setattr(cls, name, field)
@@ -80,9 +76,16 @@ class addSurveyForm(SurveyBaseForm):
                         render_kw={'placeholder': u'请输入标题'})
     content = TextAreaField(u'内容', widget=TextArea(), \
                             render_kw={'class': 'text-body', 'rows': 20})
+    dimension = TextAreaField(u'维度', widget=TextArea(), \
+                            render_kw={'class': 'text-body', 'rows': 10})
     describe = StringField(u'说明')
     submit = SubmitField(u'提交')
 
 
 class editSurveyForm(addSurveyForm):
     survey_id = HiddenField(u'survey_id')
+
+
+class distribSurveyForm(Form):
+    user_id = HiddenField(u'user_id')
+    surveys = MultiCheckboxField(u'选择问卷', choices = [])

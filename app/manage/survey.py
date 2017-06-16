@@ -23,7 +23,7 @@ from app.models import SurveyPernission, SurveyStatus, SurveyPageType, \
         Role, User, UserMeta, \
         Survey, SurveyMeta, SurveyPage, SurveyResult, \
         Relation, Distribute
-from forms import SurveyBaseForm, addSurveyForm, editSurveyForm
+from forms import SurveyBaseForm, addSurveyForm, editSurveyForm, distribSurveyForm
 
 
 class LabelRadioField(RadioField):
@@ -76,10 +76,10 @@ def buildSurveyForm(item_list):
 @login_required
 def previewSurvey(survey_id):
     survey = Survey.query.filter_by(id=survey_id).first_or_404()
-    survey_origin = survey.metas.filter_by(meta_key='survey_origin')\
-                        .order_by(SurveyMeta.id.desc())\
-                        .first().meta_value
-    survey_pages = loadYAML(survey_origin)
+    #survey_origin = survey.metas.filter_by(meta_key='survey_origin')\
+    #                    .order_by(SurveyMeta.id.desc())\
+    #                    .first().meta_value
+    survey_pages = loadYAML(survey.content_origin)
     preview = []
     for page in survey_pages:
         form = buildSurveyForm(page['items'])
@@ -95,13 +95,13 @@ def listSurvey():
     page = request.args.get('page', 1, type=int)
     if current_user.is_administrator():
         pagination = Survey.query.filter(Survey.status != SurveyStatus.DELETE)\
-                        .order_by(Survey.uptime.desc())\
+                        .order_by(Survey.id.asc())\
                         .paginate(page, per_page=current_app.config['ENTRIES_PER_PAGE'],
                                  error_out=False)
         surveys = pagination.items
     else:
         pagination = current_user.own_surveys.filter(Survey.status != SurveyStatus.DELETE)\
-                        .order_by(Survey.uptime.desc())\
+                        .order_by(Survey.id.asc())\
                         .paginate(page, per_page=current_app.config['ENTRIES_PER_PAGE'],
                                  error_out=False)
         surveys = (item.survey for item in pagination.items)
@@ -122,6 +122,8 @@ def addSurvey():
         survey = Survey(
                         title=form.title.data,
                         description=form.describe.data,
+                        content_origin=form.content.data,
+                        dimension=form.dimension.data,
                         uptime=datetime.now(),
                         author=current_user
                         )
@@ -155,15 +157,17 @@ def editSurvey(survey_id):
         flash(u'权限不足')
         return redirect(url_for('manage.listSurvey'))
     survey = Survey.query.filter_by(id=survey_id).first_or_404()
-    survey_origin = survey.metas.filter_by(meta_key='survey_origin')\
-                        .order_by(SurveyMeta.id.desc())\
-                        .first().meta_value
+#    survey_origin = survey.metas.filter_by(meta_key='survey_origin')\
+#                        .order_by(SurveyMeta.id.desc())\
+#                        .first().meta_value
     form = editSurveyForm()
     if form.validate_on_submit() and \
-            survey_id == int(form.survry_id.data):
-        survey.title=form.title.data
-        survey.description=form.describe.data
-        survey.uptime=datetime.now()
+            survey_id == int(form.survey_id.data):
+        survey.title = form.title.data
+        survey.description = form.describe.data
+        survey.content_origin = form.content.data
+        survey.dimension = form.dimension.data
+        survey.uptime = datetime.now()
 
         if current_user.is_administrator():
             survey.status = SurveyStatus.PUB
@@ -183,7 +187,8 @@ def editSurvey(survey_id):
         return redirect(url_for('manage.listSurvey'))
     else:
         form.title.data = survey.title
-        form.content.data = survey_origin
+        form.content.data = survey.content_origin
+        form.dimension.data = survey.dimension
         form.describe.data = survey.description
         form.survey_id.data = survey.id    
 
@@ -218,4 +223,45 @@ def delSurvey(survey_id):
 @manage.route('/distribute-survey/',  methods=["GET", "POST"])
 @login_required
 def distributeSurvey():
-    return "distributeSurvey"
+    user_id = request.args.get('user_id', 0, type=int)
+    if not user_id:
+        abort(404)
+
+    user = User.query.filter_by(id=user_id).first_or_404()
+    if user.role.name == 'visitor':
+        dis_type = OwnerType.VISITOR
+    elif user.role.name == 'psycho':
+        dis_type = OwnerType.PSYCHO
+    elif user.role.name == 'supervisor':
+        dis_type = OwnerType.SUPER
+    else:
+        abort(500)
+
+    form = distribSurveyForm()
+    if current_user.is_administrator():
+        surveys = Survey.query.filter(Survey.status != SurveyStatus.DELETE)\
+                        .order_by(Survey.id.asc())\
+                        .all()
+    else:
+        surveys = [own.survey for own in current_user.own_surveys\
+                                    .filter(Survey.status != SurveyStatus.DELETE)\
+                                    .order_by(Survey.id.asc()).all()]
+    if not surveys:
+        return u'没有可供分发的问卷'
+
+    form.user_id = user_id
+    form.surveys.choices = [(s.id, s.title) for s in surveys]
+
+    if form.is_submitted():
+        print form.surveys.data
+        return redirect(url_for('manage.listUser'))
+    else:
+
+        user_own = [str(own.survey.id) for own in user.own_surveys\
+                                    .filter(Survey.status != SurveyStatus.DELETE)\
+                                    .order_by(Survey.id.asc()).all()]
+        return render_template('manage/list_discribute_surveys.html',
+                                form=form,
+                                user_own=user_own,
+                                user_id=user_id
+                                )

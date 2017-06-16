@@ -13,7 +13,7 @@ from app import create_app, db
 from app.models import SurveyPernission, SurveyStatus, SurveyPageType, RelationType, OwnerType, \
         Role, User, UserMeta, \
         Survey, SurveyMeta, SurveyPage, SurveyResult, \
-        Relation, Distribute
+        Relation, Distribute, Message, MesgType
 
 app = create_app('default')
 manager = Manager(app)
@@ -26,7 +26,8 @@ def make_shell_context():
                 Role=Role, User=User, UserMeta=UserMeta,
                 Survey=Survey, SurveyMeta=SurveyMeta, 
                 SurveyPage=SurveyPage, SurveyResult=SurveyResult, 
-                Relation=Relation, Distribute=Distribute
+                Relation=Relation, Distribute=Distribute,
+                Message=Message, MesgType=MesgType
                 )
 
 

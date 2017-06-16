@@ -25,6 +25,15 @@
       <td>
           <a href="{{ url_for('manage.editUser', user_id=user.id) }}" class="btn btn-default btn-sm" role="button">编辑</a>
           <a href="#" url-target="{{ url_for('manage.delUser', user_id=user.id) }}" class="delete btn btn-default btn-sm" role="button">删除</a>
+          {%- if current_user.is_administrator() %}
+            {%- if not user.is_administrator() %}
+          <a href="#" url-target="{{ url_for('manage.distributeSurvey', user_id=user.id) }}" class="btn btn-default btn-sm dis-sruvey" role="button">分发问卷</a>
+            {% endif -%}
+          {% else %}
+            {% if user.role.name == 'visitor' %}
+          <a href="#" url-target="{{ url_for('manage.distributeSurvey', user_id=user.id) }}" class="btn btn-default btn-sm dis-sruvey" role="button">分发问卷</a>
+            {% endif -%}
+          {% endif -%}
       </td>
     </tr>
     {% endfor %}
@@ -53,6 +62,21 @@ jQuery( document ).ready(function(){
           //console.log(url);
         });
         jQuery('div#infoModal').modal('show');
+    });
+  });
+  jQuery('a.dis-sruvey').each(function(){
+    jQuery(this).click(function(){
+      var url = jQuery(this).attr("url-target");
+      jQuery.get(
+            url,
+            function(data){
+              jQuery('div.modal-body').empty().html(data);
+            });
+      jQuery('div.modal-content').removeClass('alert alert-danger');
+      jQuery('div.modal-footer #subBtn').removeClass('btn-danger').click(function(){
+        jQuery('div#infoModal form').submit();
+      });
+      jQuery('div#infoModal').modal('show');
     });
   });
 }); 

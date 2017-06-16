@@ -16,7 +16,7 @@ from app.models import SurveyPernission, SurveyStatus, SurveyPageType, \
         RelationType, OwnerType, \
         Role, User, UserMeta, \
         Survey, SurveyMeta, SurveyPage, SurveyResult, \
-        Relation, Distribute
+        Relation, Distribute, Message, MesgType
 from forms import LoginForm, RegForm
 
 

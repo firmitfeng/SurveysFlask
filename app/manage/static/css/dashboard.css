@@ -85,3 +85,13 @@ body {
 #infoModal ul.img-list li img{
   width:160px;
 }
+#infoModal .checkbox-group{
+  margin:0;
+}
+#infoModal .checkbox-group p{
+  font-weight:bold;
+}
+#infoModal .checkbox-group .horizontal {
+    float: left;
+    margin-right: 10px;
+}

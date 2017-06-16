@@ -17,6 +17,7 @@ csrf = CsrfProtect()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'main.login'
+login_manager.login_message = u'请先登录'
 
 
 def create_app(config_name):
