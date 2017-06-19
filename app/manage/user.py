@@ -179,47 +179,11 @@ def listVisitor():
                     .paginate(page, per_page=current_app.config['ENTRIES_PER_PAGE'],
                               error_out=False)
     visitors = pagination.items
-    return render_template('manage/list_visitor.html',
+    return render_template('manage/list_lower.html',
                            users=visitors,
                            pagination=pagination,
                            pagetitle=u'来访者列表',
                            userManage='active'
-                          )
-
-@manage.route('/distribute-psycho/<int:user_id>',  methods=["GET", "POST"])
-@login_required
-def distributPsycho(user_id):
-    if not current_user.is_administrator():
-        flash(u'权限不足')
-        return redirect(url_for('manage.listUser'))
-    user = User.query.filter_by(id=user_id).first_or_404()
-    role_psycho = Role.query.filter_by(name='psycho').first()
-    psychos = User.query.filter_by(role=role_psycho)\
-                    .order_by(User.id.asc())\
-                    .all()
-    upper = user.upper.first()
-    form = distribPsychoForm()
-    if form.is_submitted():
-        psycho = User.query.filter_by(id=form.uppers.data).first_or_404()
-        if int(form.user_id.data) == user_id:
-            if not upper:
-                upper = Relation()
-
-            upper.upper_id = form.uppers.data
-            upper.lower_id = user_id
-            upper.type = RelationType.VISIT
-            db.session.add(upper)
-            db.session.commit()
-            flash(u'操作成功')
-        return redirect(url_for('manage.listVisitor'))
-    else:
-        form.user_id.data = user_id
-        form.uppers.choices = [(p.id, p.name) for p in psychos]
-        if upper:
-            form.uppers.data = upper.upper_id
-    return render_template('manage/list_discribute_psycho.html',
-                           form=form,
-                           user_id=user_id
                           )
 
 
@@ -236,21 +200,61 @@ def listPsycho():
                     .paginate(page, per_page=current_app.config['ENTRIES_PER_PAGE'],
                               error_out=False)
     psychos = pagination.items
-    return render_template('manage/list_psycho.html',
+    return render_template('manage/list_lower.html',
                            users=psychos,
                            pagination=pagination,
                            pagetitle=u'咨询师列表',
                            userManage='active'
                           )
 
-@manage.route('/distribute-supervisor/',  methods=["GET", "POST"])
+@manage.route('/distribute-upper/<int:user_id>',  methods=["GET", "POST"])
 @login_required
-def distributSupervisor():
+def distributeUpper(user_id):
     if not current_user.is_administrator():
         flash(u'权限不足')
         return redirect(url_for('manage.listUser'))
-    role_super = Role.query.filter_by(name='supervisor').first()
-    supervisors = User.query.filter_by(role=role_super)\
+    user = User.query.filter_by(id=user_id).first_or_404()
+    
+    if user.role.name == 'visitor':
+        role_upper = Role.query.filter_by(name='psycho').first()
+        form = distribPsychoForm()
+        upper_type = RelationType.VISIT
+        url_to = 'manage.listVisitor'
+    elif user.role.name == 'psycho':
+        role_upper = Role.query.filter_by(name='supervisor').first()
+        form = distribSupervisorForm()
+        upper_type = RelationType.SUPERVISE
+        url_to = 'manage.listPsycho'
+    else:
+        flash(u'当前用户无法分配')
+        return redirect(url_for('manage.listUser'))
+
+    uppers = User.query.filter_by(role=role_upper)\
                     .order_by(User.id.asc())\
                     .all()
-    return "distributeSupervisor"
+    upper_of_user = user.upper.first()
+    if form.is_submitted():
+        User.query.filter_by(id=form.uppers.data).first_or_404()
+        print form.uppers.data
+
+        if int(form.user_id.data) == user_id:
+            if not upper_of_user:
+                upper_of_user = Relation()
+
+            upper_of_user.upper_id = form.uppers.data
+            upper_of_user.lower_id = user_id
+            upper_of_user.type = upper_type
+            db.session.add(upper_of_user)
+            db.session.commit()
+            flash(u'操作成功')
+        return redirect(url_for(url_to))
+    else:
+        form.user_id.data = user_id
+        form.uppers.choices = [(p.id, p.name) for p in uppers]
+        if upper_of_user:
+            form.uppers.data = upper_of_user.upper_id
+    return render_template('manage/list_discribute_upper.html',
+                           form=form,
+                           user_id=user_id
+                          )
+

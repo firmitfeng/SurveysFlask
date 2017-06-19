@@ -23,7 +23,11 @@
       <td>{{user.role.name}}</td>
       <td>{{user.last_login_time.strftime('%Y-%m-%d')}}</td>
       <td>
-        <a href="#" url-target="{{ url_for('manage.distributSupervisor', user_id=user.id) }}" class="btn btn-default btn-sm dis-super" role="button">分配督导师</a>
+        {%- if user.role.name == 'visitor' %}
+        <a href="#" url-target="{{ url_for('manage.distributeUpper', user_id=user.id) }}" class="btn btn-default btn-sm dis-upper" role="button">分配咨询师</a>
+        {% elif user.role.name == 'psycho' %}
+        <a href="#" url-target="{{ url_for('manage.distributeUpper', user_id=user.id) }}" class="btn btn-default btn-sm dis-upper" role="button">分配督导师</a>
+        {% endif -%}
       </td>
     </tr>
     {% endfor %}
@@ -42,7 +46,7 @@
 {{ super() }}
 <script>
 jQuery( document ).ready(function(){
-  jQuery('a.dis-super').each(function(){
+  jQuery('a.dis-upper').each(function(){
     jQuery(this).click(function(){
       var url = jQuery(this).attr("url-target");
       jQuery.get(

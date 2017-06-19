@@ -135,6 +135,9 @@ def addSurvey():
 
         db.session.add(survey)
         db.session.add(survey_origin)
+        db.session.add(Distribute(owner=current_user, 
+                                  survey=survey, 
+                                  type=OwnerType.OWNER))
         db.session.commit()
 
         flash(u'操作成功')
@@ -149,10 +152,11 @@ def addSurvey():
 @manage.route('/edit-survey/<int:survey_id>', methods=["GET", "POST"])
 @login_required
 def editSurvey(survey_id):
-    if not current_user.is_administrator():
+    survey = Survey.query.filter_by(id=survey_id).first_or_404()
+    if not current_user.is_administrator() and \
+        survey.author != current_user:
         flash(u'权限不足')
         return redirect(url_for('manage.listSurvey'))
-    survey = Survey.query.filter_by(id=survey_id).first_or_404()
 #    survey_origin = survey.metas.filter_by(meta_key='survey_origin')\
 #                        .order_by(SurveyMeta.id.desc())\
 #                        .first().meta_value
