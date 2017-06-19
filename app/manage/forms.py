@@ -10,7 +10,7 @@ from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from datetime import datetime
 from app.models import Role
-from utils.libform import MultiCheckboxField
+from utils.libform import MultiCheckboxField, LabelRadioField
 
 
 #class CheckboxSelectField(QuerySelectMultipleField):
@@ -89,3 +89,13 @@ class editSurveyForm(addSurveyForm):
 class distribSurveyForm(Form):
     user_id = HiddenField(u'user_id')
     surveys = MultiCheckboxField(u'选择问卷', choices = [])
+
+
+class distribPsychoForm(Form):
+    user_id = HiddenField(u'user_id')
+    uppers = LabelRadioField(u'选择咨询师', choices = [], coerce=int)
+
+
+class distribSupervisorForm(Form):
+    user_id = HiddenField(u'user_id')
+    uppers = LabelRadioField(u'选择督导师', choices = [], coerce=int)

@@ -13,7 +13,7 @@ from wtforms.validators import DataRequired
 from werkzeug import secure_filename
 from utils.libserialnum import encodeSerialNum
 from utils.libimage import resizeImg, Horizontal, Vertical, clipImg, clipReszImg
-from utils.libform import MultiCheckboxField
+from utils.libform import MultiCheckboxField, LabelRadioField
 import pypinyin
 import yaml
 from .. import db, csrf
@@ -24,10 +24,6 @@ from app.models import SurveyPernission, SurveyStatus, SurveyPageType, \
         Survey, SurveyMeta, SurveyPage, SurveyResult, \
         Relation, Distribute
 from forms import SurveyBaseForm, addSurveyForm, editSurveyForm, distribSurveyForm
-
-
-class LabelRadioField(RadioField):
-    pass
 
 
 def loadYAML(y_str, key='pages'):
@@ -253,7 +249,16 @@ def distributeSurvey():
     form.surveys.choices = [(s.id, s.title) for s in surveys]
 
     if form.is_submitted():
-        print form.surveys.data
+        #删除指定用户所有的分配
+        user.own_surveys.delete()
+        db.session.commit()
+        for survey_id in form.surveys.data:
+            db.session.add(Distribute(
+                                      user_id=user_id, 
+                                      survey_id=survey_id, 
+                                      type=dis_type))
+        db.session.commit()
+        flash(u'操作成功')
         return redirect(url_for('manage.listUser'))
     else:
 

@@ -23,7 +23,8 @@ from app.models import SurveyPernission, SurveyStatus, SurveyPageType, \
         Role, User, UserMeta, \
         Survey, SurveyMeta, SurveyPage, SurveyResult, \
         Relation, Distribute
-from forms import addUserForm, editUserForm
+from forms import addUserForm, editUserForm, \
+        distribSupervisorForm, distribPsychoForm
 
 
 @manage.route('/list-user', methods=["GET"])
@@ -165,7 +166,91 @@ def delUser(user_id):
     return redirect(url_for('manage.listUser'))
 
 
-@manage.route('/distribute-user/',  methods=["GET", "POST"])
+@manage.route('/list-visitor/')
 @login_required
-def distributeUser():
-    return "distributeUser"
+def listVisitor():
+    if not current_user.is_administrator():
+        flash(u'权限不足')
+        return redirect(url_for('manage.listUser'))
+    page = request.args.get('page', 1, type=int)
+    role_visitor = Role.query.filter_by(name='visitor').first()
+    pagination = User.query.filter_by(role=role_visitor)\
+                            .order_by(User.id.asc())\
+                    .paginate(page, per_page=current_app.config['ENTRIES_PER_PAGE'],
+                              error_out=False)
+    visitors = pagination.items
+    return render_template('manage/list_visitor.html',
+                           users=visitors,
+                           pagination=pagination,
+                           pagetitle=u'来访者列表',
+                           userManage='active'
+                          )
+
+@manage.route('/distribute-psycho/<int:user_id>',  methods=["GET", "POST"])
+@login_required
+def distributPsycho(user_id):
+    if not current_user.is_administrator():
+        flash(u'权限不足')
+        return redirect(url_for('manage.listUser'))
+    user = User.query.filter_by(id=user_id).first_or_404()
+    role_psycho = Role.query.filter_by(name='psycho').first()
+    psychos = User.query.filter_by(role=role_psycho)\
+                    .order_by(User.id.asc())\
+                    .all()
+    upper = user.upper.first()
+    form = distribPsychoForm()
+    if form.is_submitted():
+        psycho = User.query.filter_by(id=form.uppers.data).first_or_404()
+        if int(form.user_id.data) == user_id:
+            if not upper:
+                upper = Relation()
+
+            upper.upper_id = form.uppers.data
+            upper.lower_id = user_id
+            upper.type = RelationType.VISIT
+            db.session.add(upper)
+            db.session.commit()
+            flash(u'操作成功')
+        return redirect(url_for('manage.listVisitor'))
+    else:
+        form.user_id.data = user_id
+        form.uppers.choices = [(p.id, p.name) for p in psychos]
+        if upper:
+            form.uppers.data = upper.upper_id
+    return render_template('manage/list_discribute_psycho.html',
+                           form=form,
+                           user_id=user_id
+                          )
+
+
+@manage.route('/list-psycho/')
+@login_required
+def listPsycho():
+    if not current_user.is_administrator():
+        flash(u'权限不足')
+        return redirect(url_for('manage.listUser'))
+    page = request.args.get('page', 1, type=int)
+    role_psycho = Role.query.filter_by(name='psycho').first()
+    pagination = User.query.filter_by(role=role_psycho)\
+                    .order_by(User.id.asc())\
+                    .paginate(page, per_page=current_app.config['ENTRIES_PER_PAGE'],
+                              error_out=False)
+    psychos = pagination.items
+    return render_template('manage/list_psycho.html',
+                           users=psychos,
+                           pagination=pagination,
+                           pagetitle=u'咨询师列表',
+                           userManage='active'
+                          )
+
+@manage.route('/distribute-supervisor/',  methods=["GET", "POST"])
+@login_required
+def distributSupervisor():
+    if not current_user.is_administrator():
+        flash(u'权限不足')
+        return redirect(url_for('manage.listUser'))
+    role_super = Role.query.filter_by(name='supervisor').first()
+    supervisors = User.query.filter_by(role=role_super)\
+                    .order_by(User.id.asc())\
+                    .all()
+    return "distributeSupervisor"

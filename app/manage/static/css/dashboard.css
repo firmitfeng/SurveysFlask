@@ -95,3 +95,13 @@ body {
     float: left;
     margin-right: 10px;
 }
+#infoModal .radio-group{
+  margin:0;
+}
+#infoModal .radio-group p{
+  font-weight:bold;
+}
+#infoModal .radio-group .horizontal {
+    float: left;
+    margin-right: 10px;
+}

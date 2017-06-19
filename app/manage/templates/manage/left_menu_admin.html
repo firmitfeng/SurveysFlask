@@ -25,8 +25,8 @@
         <ul class="nav">
           <li><a href="{{ url_for('manage.listUser') }}">用户列表</a></li>
           <li><a href="{{ url_for('manage.addUser') }}">添加用户</a></li>
-          <li><a href="{{ url_for('manage.distributeUser', target='visitor') }}">分配咨询师</a></li>
-          <li><a href="{{ url_for('manage.distributeUser', target='psycho') }}">分配督导师</a></li>
+          <li><a href="{{ url_for('manage.listVisitor') }}">分配咨询师</a></li>
+          <li><a href="{{ url_for('manage.listPsycho') }}">分配督导师</a></li>
         </ul>
       </div>
     </div>
@@ -42,8 +42,6 @@
         <ul class="nav">
           <li><a href="{{ url_for('manage.listSurvey') }}">问卷列表</a></li>
           <li><a href="{{ url_for('manage.addSurvey') }}">添加问卷</a></li>
-          <li><a href="{{ url_for('manage.distributeSurvey', target='visitor') }}">分配问卷给来访者</a></li>
-          <li><a href="{{ url_for('manage.distributeSurvey', target='psycho') }}">分配问卷给咨询师</a></li>
         </ul>
       </div>
     </div>

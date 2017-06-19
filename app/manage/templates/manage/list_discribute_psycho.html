@@ -1,7 +1,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "manage/form_macro.html" as form_macro %}
 
-<form action="{{url_for('manage.distributeSurvey', user_id=user_id)}}" method="post" class="form form-horizontal" role="form">
+<form action="{{url_for('manage.distributPsycho', user_id=user_id)}}" method="post" class="form form-horizontal" role="form">
   {{ form.hidden_tag() }}
 
   {%- if form.errors %}
@@ -14,13 +14,13 @@
     {%- endfor %}
   {%- endif %}
 
-  <div class="form-group checkbox-group {% if required %} required{% endif %}">
-    <p>{{ form.surveys.label.text|safe}}</p>
-    {% for item in form.surveys -%}
+  <div class="form-group radio-group {% if required %} required{% endif %}">
+    <p>{{ form.uppers.label.text|safe}}</p>
+    {% for item in form.uppers -%}
     {# item._value() #}
-    <div class="checkbox horizontal">
+    <div class="radio horizontal">
       <label>
-      {%- if item._value() in user_own %}
+      {%- if item._value() == form.uppers.data %}
       {{item(checked=True)|safe}} 
       {% else %}
       {{item()|safe}}
