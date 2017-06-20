@@ -17,16 +17,16 @@ from app.models import SurveyPernission, SurveyStatus, SurveyPageType, \
         Role, User, UserMeta, \
         Survey, SurveyMeta, SurveyPage, SurveyResult, \
         Relation, Distribute, Message, MesgType
-from forms import LoginForm, RegForm
+from forms import LoginForm, RegForm, ChangePasswordForm
 
 
 
 @main.route('/')
 @login_required
 def index():
-    if current_user.role != Role.query.filter_by(name='visitor').first():
+    if current_user.role.name != 'visitor':
         return redirect(url_for('manage.index'))
-    return "main page"
+    return render_template('main/index.html')
 
 
 @main.route('/login', methods=["GET", "POST"])
@@ -68,3 +68,29 @@ def register():
         else:
             flash(u'密码过短或两次输入不同')
     return render_template('main/reg.html', form=form)
+
+
+@main.route('/change-passwd', methods=["GET", "POST"])
+@login_required
+def ChangePasswd():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if current_user.verify_password(form.old_passwd.data)\
+                and form.re_passwd.data == form.new_passwd.data:
+            current_user.password = form.new_passwd.data
+            user_meta = UserMeta(meta_key='change_password',
+                                 meta_value=json.dumps({'username':current_user.name}),
+                                 user = current_user
+                                )
+            db.session.add(current_user)
+            db.session.add(user_meta)
+            db.session.commit()
+            logout_user()
+            flash(u'修改成功，请重新登录')
+            return redirect(url_for('main.index'))
+        else:
+            flash(u'密码错误')
+    return render_template('main/change_passwd.html',
+                            pagetitle=u'修改密码',
+                            form=form, userInfo='active')
+

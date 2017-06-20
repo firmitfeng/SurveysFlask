@@ -1,0 +1,46 @@
+<div class="panel-group" id="leftMenu" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-default {{userInfo}}">
+    <div class="panel-heading" role="tab" id="userInfoHead">
+      <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" data-parent="#leftMenu" href="#userInfo" aria-expanded="{%- if userInfo %}true{% else %}false{% endif -%}" aria-controls="userInfo">个人信息</a>
+      </h4>
+    </div>
+    <div id="userInfo" class="panel-collapse collapse {% if userInfo %}in{% endif -%}" role="tabpanel" aria-labelledby="userInfoHead">
+      <div class="panel-body">
+        <ul class="nav">
+          <li><a href="{{ url_for('main.ChangePasswd') }}">修改密码</a></li>
+          <li><a href="{{ url_for('main.logout') }}">退出</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default {{surveyManage}}">
+    <div class="panel-heading" role="tab" id="surveyManageHead">
+      <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" data-parent="#leftMenu" href="#surveyManage" aria-expanded="{%- if surveyManage %}true{% else %}false{% endif -%}" aria-controls="surveyManage">我的问卷</a>
+      </h4>
+    </div>
+    <div id="surveyManage" class="panel-collapse collapse {% if surveyManage %}in{% endif -%}" role="tabpanel" aria-labelledby="surveyManageHead">
+      <div class="panel-body">
+        <ul class="nav">
+            <li><a href="{{ url_for('main.listSurvey') }}">问卷列表</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default {{userManage}}">
+    <div class="panel-heading" role="tab" id="userManageHead">
+      <h4 class="panel-title">
+          <a role="button" data-toggle="collapse" data-parent="#leftMenu" href="#userManage" aria-expanded="{%- if userManage %}true{% else %}false{% endif -%}" aria-controls="userManage">消息管理</a>
+      </h4>
+    </div>
+    <div id="userManage" class="panel-collapse collapse {% if userManage %}in{% endif -%}" role="tabpanel" aria-labelledby="userManageHead">
+      <div class="panel-body">
+        <ul class="nav">
+          <li><a href="#">查看消息</a></li>
+          <li><a href="#">发送消息</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

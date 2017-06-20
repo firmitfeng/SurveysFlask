@@ -19,10 +19,6 @@ class CheckboxSelectField(QuerySelectField):
     option_widget = RadioInput()
 
 
-class PicRadioField(RadioField):
-    pass
-
-
 class LoginForm(Form):
     email = StringField(u'电子邮件', \
                 validators=[DataRequired(), Length(1,100), Email()])

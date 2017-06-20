@@ -20,18 +20,6 @@ class CheckboxSelectField(QuerySelectField):
     option_widget = RadioInput()
 
 
-class ChangePasswordForm(Form):
-    old_passwd = PasswordField(u'原始密码', validators=[DataRequired()],\
-                    render_kw={'placeholder': u'请输入原始密码'})
-    new_passwd = PasswordField(u'新的密码', \
-                    validators=[DataRequired(), Length(8,32)],\
-                    render_kw={'placeholder': u'请输入新的密码'})
-    re_passwd = PasswordField(u'重复密码', \
-                    validators=[EqualTo('new_passwd', message='两次输入的密码不同')],\
-                    render_kw={'placeholder': u'请再次输入新的密码'})
-    submit = SubmitField(u'提交')
-
-
 def getRoles():
     return Role.query
 
@@ -88,14 +76,14 @@ class editSurveyForm(addSurveyForm):
 
 class distribSurveyForm(Form):
     user_id = HiddenField(u'user_id')
-    surveys = MultiCheckboxField(u'选择问卷', choices = [])
+    surveys = MultiCheckboxField(u'选择问卷', coerce=int, choices=[]) 
 
 
 class distribPsychoForm(Form):
     user_id = HiddenField(u'user_id')
-    uppers = LabelRadioField(u'选择咨询师', choices = [], coerce=int)
+    uppers = LabelRadioField(u'选择咨询师', coerce=int, choices=[])
 
 
 class distribSupervisorForm(Form):
     user_id = HiddenField(u'user_id')
-    uppers = LabelRadioField(u'选择督导师', choices = [], coerce=int)
+    uppers = LabelRadioField(u'选择督导师', coerce=int, choices=[])

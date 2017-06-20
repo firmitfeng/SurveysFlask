@@ -1,0 +1,72 @@
+{% extends "bootstrap/base.html" %}
+{% import "main/form_macro.html" as form_macro %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block html_attribs %} lang="zh-CN" {% endblock %}
+{% block head %}
+  {%- block metas %}
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% endblock metas %}
+  {%- block styles %}
+  <!-- Bootstrap -->
+  <link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet">
+  <link href="{{ url_for('main.static', filename='css/global.css') }}" rel="stylesheet" media="all" type="text/css">
+  {% endblock styles %}
+  {%- block IEHack %}
+  <!--[if lt IE 9]>
+  <link href="{{ url_for('main.static', filename='css/ie6.css') }}" rel="stylesheet" media="all" type="text/css">
+  <script src="{{ url_for('main.static', filename='js/html5shiv.min.js') }}"></script>
+  <script src="{{ url_for('main.static', filename='js/respond.min.js') }}"></script>
+  <![endif]-->
+  {% endblock IEHack %}
+  <title>{% block title %}临床心理学实验室 - 北京大学心理与认知科学学院{% endblock %}</title>
+{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block content %}
+<div {% block content_attribs %} class="container" {% endblock %}>
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+      <div class="page-header">
+        <h1>{{survey.title}}</h1>
+      </div>
+      <div class="survey_page {{style}}">
+        <div class="survey_info">{%- if info %}{{info}}{% endif -%}</div>
+        <form action="{{url_for('main.fillSurvey', slug=survey.slug, p=pn)}}" method="post" class="form" role="form">
+          {{ form.hidden_tag() }}
+          {%- if form.errors %}
+            {%- for fieldname, errors in form.errors.items() %}
+              {%- if bootstrap_is_hidden_field(form[fieldname]) %}
+                {%- for error in errors %}
+                  <p class="error">{{error}}</p>
+                {%- endfor %}
+              {%- endif %}
+            {%- endfor %}
+          {%- endif %}
+          
+          {%- for field in form %}
+            {% if not bootstrap_is_hidden_field(field) -%}
+              {{ wtf.form_field(field, class="form-control survey-item")}}
+            {%- endif %}
+          {%- endfor %}
+          <div class="center-block text-center">
+          {%- if pc > pn %}
+            <button type="submit" class="btn btn-default btn-primary">下一页</button>
+          {% else %}
+            <button type="submit" class="btn btn-default btn-primary">完成</button>
+          {% endif -%}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "manage/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "manage/_macros.html" as macros %}
+
+{% block main_body %}
+<div class="panel-group" id="survey-results" role="tablist" aria-multiselectable="true">
+  {% for result in results %}
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="{{result.survey.slug}}Head">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#survey-results" href="#{{result.survey.slug}}" aria-expanded="false" aria-controls="{{result.survey.slug}}">{{result.survey.title}}</a>
+      </h4>
+    </div>
+    <div id="{{result.survey.slug}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{result.survey.slug}}Head">
+      <div class="panel-body">
+        <div>
+          <p>原始分数</p>
+          {{result.result.origin}}
+        </div>
+        <hr>
+        <div>
+          <p>维度分数</p>
+          {{result.result.dimen}}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% include 'manage/modal.html' %} 
+
+{% endblock %}

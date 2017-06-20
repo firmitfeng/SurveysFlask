@@ -10,7 +10,7 @@
   {%- block styles %}
   <!-- Bootstrap -->
   <link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet">
-  <link href="{{ url_for('main.static', filename='css/global.css') }}" rel="stylesheet" media="all" type="text/css">
+  <link href="{{ url_for('main.static', filename='css/dashboard.css') }}" rel="stylesheet" media="all" type="text/css">
   {% endblock styles %}
   {%- block IEHack %}
   <!--[if lt IE 9]>
@@ -19,10 +19,39 @@
   <script src="{{ url_for('main.static', filename='js/respond.min.js') }}"></script>
   <![endif]-->
   {% endblock IEHack %}
-  <title>{% block title %}临床实验室 - 北京大学心理与认知科学学院{% endblock %}</title>
+  <title>{% block title %}临床心理学实验室 - 北京大学心理与认知科学学院{% endblock %}</title>
 {% endblock %}
 
 {% block navbar %}
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">临床心理学实验室</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <div class="nav navbar-nav navbar-right">
+        {% if current_user.is_authenticated %}
+        <div class="btn-group">
+          <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            欢迎回来，{{current_user.name}} 
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            {#<li><a href="#">编辑个人信息</a></li>#}
+            <li><a href="{{ url_for('main.logout') }}">退出</a></li>
+          </ul>
+        </div>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
 {% endblock %}
 
 {% block content %}
@@ -31,7 +60,11 @@
   <div class="row">
     {% block left_nav %}
     <div class="col-sm-3 col-md-2 sidebar">
-        left
+    {%- if current_user.role.name == 'visitor' %}
+      {% include 'main/left_menu.html' %}
+    {% else %}
+      {% include 'manage/left_menu_admin.html' %}
+    {% endif -%}
     </div>
     {% endblock %}
 

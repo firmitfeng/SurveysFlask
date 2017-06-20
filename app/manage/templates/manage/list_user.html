@@ -10,8 +10,8 @@
       <th class="col-md-1">用户名</th>
       <th >电子邮件</th>
       <th class="col-md-1">角色</th>
-      <th class="col-md-1">最后登录时间</th>
-      <th class="col-md-2">操作</th>
+      <th class="col-md-2">最后登录时间</th>
+      <th class="col-md-3">操作</th>
     </tr>
   </thead>
   <tbody>
@@ -24,9 +24,14 @@
       <td>{{user.last_login_time.strftime('%Y-%m-%d')}}</td>
       <td>
           <a href="{{ url_for('manage.editUser', user_id=user.id) }}" class="btn btn-default btn-sm" role="button">编辑</a>
+          {%- if current_user.is_administrator() %}
           <a href="#" url-target="{{ url_for('manage.delUser', user_id=user.id) }}" class="delete btn btn-default btn-sm" role="button">删除</a>
+          {% endif -%}
           {%- if not user.is_administrator() %}
-          <a href="#" url-target="{{ url_for('manage.distributeSurvey', user_id=user.id) }}" class="btn btn-default btn-sm dis-sruvey" role="button">分发问卷</a>
+          <a href="#" url-target="{{ url_for('manage.distributeSurvey', user_id=user.id) }}" class="btn btn-default btn-sm dis-survey" role="button">分发问卷</a>
+          {% endif -%}
+          {%- if user.role.name == 'visitor' %}
+          <a href="{{ url_for('manage.dispUserSurveyResult', user_id=user.id) }}" class="btn btn-default btn-sm" role="button">查看问卷结果</a>
           {% endif -%}
       </td>
     </tr>
@@ -58,7 +63,7 @@ jQuery( document ).ready(function(){
         jQuery('div#infoModal').modal('show');
     });
   });
-  jQuery('a.dis-sruvey').each(function(){
+  jQuery('a.dis-survey').each(function(){
     jQuery(this).click(function(){
       var url = jQuery(this).attr("url-target");
       jQuery.get(

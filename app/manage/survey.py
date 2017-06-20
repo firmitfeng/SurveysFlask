@@ -9,7 +9,8 @@ from flask import render_template, session, redirect, url_for, current_app, \
 from flask_login import login_required, login_user, logout_user, current_user
 from wtforms import HiddenField, StringField, BooleanField, RadioField, \
         TextAreaField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.widgets import TextArea
+from wtforms.validators import InputRequired, DataRequired
 from werkzeug import secure_filename
 from utils.libserialnum import encodeSerialNum
 from utils.libimage import resizeImg, Horizontal, Vertical, clipImg, clipReszImg
@@ -33,34 +34,49 @@ def loadYAML(y_str, key='pages'):
 def getRandStr(s):
     return hashlib.md5(s).hexdigest()[:8].upper()
 
+
+def computeDimenScore(result, dimens):
+    ''' result: dict()
+        dimens: dict()
+    '''
+    dimen_result = {}
+    for k in result.keys():
+        locals()[k]=result[k]
+    for k in dimens.keys():
+        dimen_result[k] = eval(dimens[k])
+    return dimen_result
+
+
 def buildSurveyForm(item_list):
-    survey_page_attrs = {}
+    survey_page_attrs = {'survey_id': HiddenField(),
+                         'p': HiddenField()
+                        }
     i = 0
     for item in item_list:
         i += 1
         if 'id' not in item:
             item['id'] = 'q_{}_{}'.format(getRandStr(item['title']), i)
         if 'style' not in item:
-            item['style'] = 'basic'
+            item['style'] = ''
         if 'required' not in item:
             item['required'] = 1
         if item['type'] == 'radio':
             survey_page_attrs[item['id']] = LabelRadioField(item['title'], coerce=int,
-                                                validators=[DataRequired()],
+                                                validators=[InputRequired(message=u'请选择一个选项')],
                                                 choices=[tuple(v) for v in item['value'] ])
         elif item['type'] == 'check':
             survey_page_attrs[item['id']] = MultiCheckboxField(item['title'], coerce=int,
-                                                validators=[DataRequired()],
+                                                validators=[InputRequired(message=u'请至少选择一个选项')],
                                                 choices=[tuple(v) for v in item['value'] ])
         elif item['type'] == 'text':
             survey_page_attrs[item['id']] = TextAreaField(item['title'],
                                                 widget=TextArea(),
-                                                validators=[DataRequired()],
+                                                validators=[InputRequired(message=u'请填写题目')],
                                                 render_kw={'class': 'text-body', 'rows': 20}
                                                 )
         elif item['type'] == 'input':
             survey_page_attrs[item['id']] = StringField(item['title'],
-                                                validators=[DataRequired()])
+                                                validators=[InputRequired(message=u'请填写题目')])
         else:
             survey_page_attrs[item['id']] = StringField(item['title'])
         
@@ -79,8 +95,14 @@ def previewSurvey(survey_id):
     preview = []
     for page in survey_pages:
         form = buildSurveyForm(page['items'])
+        form.survey_id.data = survey.id
+        if 'style' in page:
+            s_style = page['style']
+        else:
+            s_style = 'survey'
         preview.append(render_template('manage/survey_page.html',
-                                        form=form, info=page['info']
+                                        form=form, info=page['info'],
+                                        style=s_style
                                       ))
     return '<hr>'.join(preview)
 
@@ -252,7 +274,7 @@ def distributeSurvey():
     form.user_id = user_id
     form.surveys.choices = [(s.id, s.title) for s in surveys]
 
-    if form.is_submitted():
+    if form.validate_on_submit():
         #删除指定用户所有的分配
         user.own_surveys.delete()
         db.session.commit()
@@ -274,3 +296,5 @@ def distributeSurvey():
                                 user_own=user_own,
                                 user_id=user_id
                                 )
+
+

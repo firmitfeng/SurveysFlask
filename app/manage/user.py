@@ -232,10 +232,10 @@ def distributeUpper(user_id):
     uppers = User.query.filter_by(role=role_upper)\
                     .order_by(User.id.asc())\
                     .all()
+    form.uppers.choices = [(p.id, p.name) for p in uppers]
     upper_of_user = user.upper.first()
-    if form.is_submitted():
+    if form.validate_on_submit():
         User.query.filter_by(id=form.uppers.data).first_or_404()
-        print form.uppers.data
 
         if int(form.user_id.data) == user_id:
             if not upper_of_user:
@@ -250,7 +250,6 @@ def distributeUpper(user_id):
         return redirect(url_for(url_to))
     else:
         form.user_id.data = user_id
-        form.uppers.choices = [(p.id, p.name) for p in uppers]
         if upper_of_user:
             form.uppers.data = upper_of_user.upper_id
     return render_template('manage/list_discribute_upper.html',
@@ -258,3 +257,21 @@ def distributeUpper(user_id):
                            user_id=user_id
                           )
 
+
+@manage.route('/user-result/<int:user_id>')
+@login_required
+def dispUserSurveyResult(user_id):
+    user = User.query.filter_by(id=user_id).first_or_404()
+#    surveys = [own.survey for own in user.own_surveys\
+#                                    .filter(Survey.status != SurveyStatus.DELETE)\
+#                                    .order_by(Survey.id.asc()).all()]
+    results = SurveyResult.query\
+                    .filter_by(user=user)\
+                    .all()
+    results = ({'survey': r.survey, 'result': json.loads(r.result)} \
+                for r in results )
+
+    return render_template('manage/list_user_survey_result.html',
+                           results=results,
+                           pagetitle=u'结果一览',
+                           userManage='active')

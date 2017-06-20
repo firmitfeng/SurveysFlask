@@ -1,13 +1,12 @@
-{% import "manage/form_macro.html" as form_macro %}
+{% import "main/form_macro.html" as form_macro %}
 {% import "bootstrap/wtf.html" as wtf %}
 
 <div class="survey_page {{style}}">
   <div class="survey_info">
       {%- if info %}{{info}}{% endif -%}
   </div>
-  <form action="" method="post" class="form form-horizontal" role="form">
+  <form action="{{url_for('main.fillSurvey', slug=slug, p=pn)}}" method="post" class="form" role="form">
     {{ form.hidden_tag() }}
-
     {%- if form.errors %}
       {%- for fieldname, errors in form.errors.items() %}
         {%- if bootstrap_is_hidden_field(form[fieldname]) %}
@@ -20,9 +19,15 @@
 
     {%- for field in form %}
       {% if not bootstrap_is_hidden_field(field) -%}
-        {{ form_macro.form_field(field, form_type="inline", horizontal_columns=('lg', 0, 12), class="form-control survey-item")}}
+        {{ form_macro.form_field(field, class="form-control survey-item")}}
       {%- endif %}
     {%- endfor %}
-    <button type="submit" class="btn btn-default">提交</button>
+    <div class="center-block text-center">
+    {%- if pc > pn %}
+      <button type="submit" class="btn btn-default btn-primary">下一页</button>
+    {% else %}
+      <button type="submit" class="btn btn-default btn-primary">完成</button>
+    {% endif -%}
+    </div>
   </form>
 </div>

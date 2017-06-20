@@ -19,7 +19,7 @@
   <script src="{{ url_for('main.static', filename='js/respond.min.js') }}"></script>
   <![endif]-->
   {% endblock IEHack %}
-  <title>{% block title %}网站管理 - 北京大学心理与认知科学学院{% endblock %}</title>
+  <title>{% block title %}临床心理学实验室 - 北京大学心理与认知科学学院{% endblock %}</title>
 {% endblock %}
 
 {% block navbar %}
@@ -43,7 +43,7 @@
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#">编辑个人信息</a></li>
+            {#<li><a href="#">编辑个人信息</a></li>#}
             <li><a href="{{ url_for('main.logout') }}">退出</a></li>
           </ul>
         </div>
