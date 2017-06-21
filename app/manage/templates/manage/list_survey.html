@@ -22,9 +22,18 @@
       <td>{{survey.author.name}}</td>
       <td>{{survey.uptime.strftime('%Y-%m-%d')}}</td>
       <td>
-          <a href="{{ url_for('manage.editSurvey', survey_id=survey.id) }}" class="btn btn-default btn-sm" role="button">编辑</a>
-          <a href="{{ url_for('manage.previewSurvey', survey_id=survey.id) }}" class="btn btn-default btn-sm" target="_blank" role="button">预览</a>
-          <a href="#" url-target="{{ url_for('manage.delSurvey', survey_id=survey.id) }}" class="delete btn btn-default btn-sm" role="button">删除</a>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">操作</button>
+          <ul class="dropdown-menu">
+            <li><a href="{{ url_for('manage.editSurvey', survey_id=survey.id) }}" class="" role="button">编辑</a></li>
+            <li><a href="{{ url_for('manage.previewSurvey', survey_id=survey.id) }}" class="" target="_blank" role="button">预览</a></li>
+            {% if current_user.is_administrator() %}
+            <li><a href="#" url-target="{{ url_for('manage.delSurvey', survey_id=survey.id) }}" class="delete" role="button">删除</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{{ url_for('manage.downloadSurveyResult', survey_id=survey.id) }}" class="dl-result" role="button">下载结果</a></li>
+            {% endif %}
+          </ul>
+        </div>
       </td>
     </tr>
     {% endfor %}

@@ -268,8 +268,8 @@ def dispUserSurveyResult(user_id):
     results = SurveyResult.query\
                     .filter_by(user=user)\
                     .all()
-    results = ({'survey': r.survey, 'result': json.loads(r.result)} \
-                for r in results )
+    #results = ({'survey': r.survey, 'result': json.loads(r.result)} \
+    #            for r in results )
 
     return render_template('manage/list_user_survey_result.html',
                            results=results,

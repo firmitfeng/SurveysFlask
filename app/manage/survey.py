@@ -5,7 +5,7 @@ from datetime import datetime
 import random
 import hashlib
 from flask import render_template, session, redirect, url_for, current_app, \
-        abort, flash, request, make_response, g
+        abort, flash, request, make_response, g, Response
 from flask_login import login_required, login_user, logout_user, current_user
 from wtforms import HiddenField, StringField, BooleanField, RadioField, \
         TextAreaField, SubmitField
@@ -298,3 +298,48 @@ def distributeSurvey():
                                 )
 
 
+def stream_template(template_name, **context):
+    current_app.update_template_context(context)
+    t = current_app.jinja_env.get_template(template_name)
+    rv = t.stream(context)
+    rv.enable_buffering(5)
+    return rv
+
+
+@manage.route('/download-survey-result/<int:survey_id>', methods=["GET"])
+@login_required
+def downloadSurveyResult(survey_id):
+    survey = Survey.query.filter_by(id=survey_id).first_or_404()
+    if not current_user.is_administrator() and \
+        current_user.own_surveys.filter(Survey.id == survey_id).all():
+        #survey.author != current_user:
+        flash(u'权限不足')
+        return redirect(url_for('manage.listSurvey'))
+
+    # 取得问卷条目的ID
+    origin_keys = []
+    dimen_keys = (yaml.load(survey.dimension)).keys()
+    for page in loadYAML(survey.content_origin):
+        for item in page['items']:
+            origin_keys.append(item['id'])
+    keys = origin_keys+dimen_keys
+
+    survey_results = SurveyResult.query\
+                        .filter_by(survey=survey)\
+                        .order_by(SurveyResult.id.asc())\
+                        .all()
+    results = (json.loads(r.result) for r in survey_results)
+    r_list = []
+    for row in results:
+        o = [str(row['origin'][k]) for k in origin_keys]
+        d = [str(row['dimen'][k]) for k in dimen_keys]
+        r_list.append(','.join(o+d))
+
+
+    resp = Response(stream_template('manage/survey_results.csv', 
+                                    results=r_list,
+                                    keys='","'.join(keys)
+                                    ),
+                    mimetype='text/csv')
+    resp.headers['Content-Disposition']='attachment; filename={}.csv'.format(survey.slug)
+    return resp

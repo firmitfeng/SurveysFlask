@@ -293,7 +293,7 @@ class SurveyPage(db.Model):
                             )
 
     def __repr__(self):
-        return '<SurveyPage {}: {}'.format(self.survey_id, self.slug)
+        return '<SurveyPage {}: {}>'.format(self.survey_id, self.slug)
 
 
 class SurveyResult(db.Model):
@@ -312,7 +312,7 @@ class SurveyResult(db.Model):
                             )
 
     def __repr__(self):
-        return '<SurveyResult {} {}'.format(self.user_id, self.survey_id)
+        return '<SurveyResult user: {} survey: {}>'.format(self.user_id, self.survey_id)
 
 
 class Message(db.Model):

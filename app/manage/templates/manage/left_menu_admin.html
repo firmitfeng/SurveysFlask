@@ -24,9 +24,11 @@
       <div class="panel-body">
         <ul class="nav">
           <li><a href="{{ url_for('manage.listUser') }}">用户列表</a></li>
+          {% if current_user.is_administrator() %}
           <li><a href="{{ url_for('manage.addUser') }}">添加用户</a></li>
           <li><a href="{{ url_for('manage.listVisitor') }}">分配咨询师</a></li>
           <li><a href="{{ url_for('manage.listPsycho') }}">分配督导师</a></li>
+          {% endif %}
         </ul>
       </div>
     </div>

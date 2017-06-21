@@ -4,6 +4,7 @@
 
 {% block main_body %}
 <div class="panel-group" id="survey-results" role="tablist" aria-multiselectable="true">
+{% if results %}
   {% for result in results %}
   <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="{{result.survey.slug}}Head">
@@ -12,21 +13,45 @@
       </h4>
     </div>
     <div id="{{result.survey.slug}}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="{{result.survey.slug}}Head">
-      <div class="panel-body">
-        <div>
-          <p>原始分数</p>
-          {{result.result.origin}}
-        </div>
-        <hr>
-        <div>
-          <p>维度分数</p>
-          {{result.result.dimen}}
-        </div>
+      <div class="panel-body" survey-result='({{result.result}})'>
       </div>
     </div>
   </div>
   {% endfor %}
+{% else %}
+  <p>没有结果</p>
+{% endif %}
 </div>
 {% include 'manage/modal.html' %} 
 
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script>
+function sortbyKey(obj){
+  var arr =[];
+  var ks = Object.keys(obj).sort();
+  for (var k in ks){
+    arr.push({'key': ks[k], 'val': obj[ks[k]]});
+  }
+  return arr;
+}
+function getSortedStr(obj){
+  var html_str = '';
+  var ks = Object.keys(obj).sort();
+  for (var k in ks){
+    html_str += (ks[k] +":"+ obj[ks[k]]+ " ");
+  }
+  return html_str.replace(/^\s+|\s+$/g,"");
+}
+jQuery('#survey-results .panel-body').each(function(){
+  var result = eval(jQuery(this).attr('survey-result'));
+  var html_str = '<h4>原始数据</h4><p>{origin}</p><h4>维度数据</h4><p>{dimen}</p>';
+  for (k in result){
+    html_str = html_str.replace("{"+k+"}", getSortedStr(result[k]));
+  }
+  jQuery(this).html(html_str);
+});
+</script>
 {% endblock %}

@@ -18,7 +18,11 @@
       <td><span title="{{survey.title}}">{{survey.title | truncate(35, True)}}</span></td>
       {#<br><span >{{survey.description}}</span></td>#}
       <td>
-          <a href="{{ url_for('main.fillSurvey', slug=survey.slug) }}" class="btn btn-default btn-sm" target="_blank" role="button">填写问卷</a>
+      {% if survey.result %}
+        <a href="#" class="btn btn-default btn-sm" role="button" disabled>已经完成</a>
+      {% else %}
+        <a href="{{ url_for('main.fillSurvey', slug=survey.slug) }}" class="btn btn-default btn-sm" target="_blank" role="button">填写问卷</a>
+      {% endif %}
       </td>
     </tr>
     {% endfor %}

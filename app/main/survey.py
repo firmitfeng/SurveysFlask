@@ -34,7 +34,12 @@ def listSurvey():
                         .order_by(Survey.id.asc())\
                         .paginate(page, per_page=current_app.config['ENTRIES_PER_PAGE'],
                                   error_out=False)
-    surveys = (item.survey for item in pagination.items)
+    surveys = ({'id': item.survey.id, 
+                'title': item.survey.title,
+                'description': item.survey.description,
+                'slug': item.survey.slug,
+                'result': item.survey.results.filter_by(user=current_user).first()} 
+                for item in pagination.items)
 
     return render_template('main/list_survey.html',
                            surveys=surveys,
