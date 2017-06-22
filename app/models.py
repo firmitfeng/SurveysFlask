@@ -321,6 +321,7 @@ class Message(db.Model):
     subject = db.Column(db.String(255))
     content = db.Column(db.Text)
     type = db.Column(db.String(64))
+    ctime = db.Column(db.DateTime, default=datetime.now())
     is_read = db.Column(db.SmallInteger, default=0)
     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -342,7 +343,33 @@ class Message(db.Model):
                                 backref=db.backref('parent', remote_side=[id]),
                                 lazy='dynamic'
                               )
+    sender_deled = db.Column(db.SmallInteger, default=0)
+    receiver_deled = db.Column(db.SmallInteger, default=0)
    
     def __repr__(self):
         return '<Message sender:{} receiver:{} subject:{}>'\
                     .format(self.sender_id, self.receiver_id, self.subject)
+
+
+class Archive(db.Model):
+    __tablename__ = 'archives'
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text)
+    keywords = db.Column(db.String(200))
+    type = db.Column(db.String(64))
+    ctime = db.Column(db.DateTime, default=datetime.now())
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    object_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    author = db.relationship('User',
+                            primaryjoin = "Archive.author_id == User.id",
+                            backref=db.backref("estimates", lazy='dynamic')
+                            )
+    object = db.relationship('User',
+                            primaryjoin = "Archive.object_id == User.id",
+                            backref=db.backref("records", lazy='dynamic')
+                            )
+
+    def __repr__(self):
+        return '<Archive author:{} object:{}'.format(self.author_id, self.object_id)
+
+
