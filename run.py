@@ -4,6 +4,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
+import os
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 #from flask import Flask, render_template, url_for, session, redirect, flash, make_response
@@ -13,7 +14,7 @@ from app import create_app, db
 from app.models import SurveyPernission, SurveyStatus, SurveyPageType, RelationType, OwnerType, \
         Role, User, UserMeta, \
         Survey, SurveyMeta, SurveyPage, SurveyResult, \
-        Relation, Distribute, Message, MesgType
+        Relation, Distribute, Message, MesgType, Archive
 
 app = create_app('default')
 manager = Manager(app)
@@ -27,7 +28,8 @@ def make_shell_context():
                 Survey=Survey, SurveyMeta=SurveyMeta, 
                 SurveyPage=SurveyPage, SurveyResult=SurveyResult, 
                 Relation=Relation, Distribute=Distribute,
-                Message=Message, MesgType=MesgType
+                Message=Message, MesgType=MesgType,
+                Archive=Archive
                 )
 
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*- 
 import os
+import logging
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class config:
@@ -10,6 +11,10 @@ class config:
     ENTRIES_PER_PAGE = 20
 
     THREADED = True
+
+    LOG_DIR = os.path.abspath(os.path.join(basedir, 'logs'))
+    LOG_LEVEL = logging.DEBUG
+    LOG_FORMAT = "[%(levelname)s] [%(asctime)s] %(message)s [in %(pathname)s: %(lineno)d (%(funcName)s)]"
 
     @staticmethod
     def init_app(app):

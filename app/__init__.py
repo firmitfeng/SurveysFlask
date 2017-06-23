@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 
 from flask import Flask
 from flask_bootstrap import Bootstrap
@@ -39,6 +40,13 @@ def create_app(config_name):
 
     #from .api import api
     #app.register_blueprint(api, url_prefix='/api')
+
+    if not app.debug:
+        import logging
+        file_handler = logging.FileHandler(os.path.join(app.config['LOG_DIR'], 'flask.log'))
+        file_handler.setLevel(app.config['LOG_LEVEL'])
+        file_handler.setFormatter(logging.Formatter(app.config['LOG_FORMAT']))
+        app.logger.addHandler(file_handler)
 
     return app
 
