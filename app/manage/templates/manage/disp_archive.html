@@ -1,0 +1,15 @@
+{% extends "manage/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block main_header %}
+<h3 class="page-header">{{archive.title}}</h3>
+{% endblock %}
+
+{% block main_body %}
+<p><strong>作者：</strong>{{archive.author.name}}</p>
+<p> </p>
+{{archive.content | safe}}
+<hr>
+<p class="pull-right">{{archive.ctime}}</p>
+<p style="padding:15px 0; text-align:center;"><a href="{{url_for('manage.listArchives', user_id=archive.target_id) }}" class="btn btn-primary">返回</a></p>
+{% endblock %}

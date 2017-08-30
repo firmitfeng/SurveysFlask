@@ -2,6 +2,7 @@
 import os
 import json
 from datetime import datetime
+from functools import wraps
 from flask import render_template, session, redirect, url_for, current_app, \
     abort, flash, request, make_response, g
 from flask_login import login_required, login_user, logout_user, current_user
@@ -20,9 +21,20 @@ from app.models import SurveyPernission, SurveyStatus, SurveyPageType, \
 from forms import LoginForm, RegForm, ChangePasswordForm
 
 
+def get_msg_count(func):
+    @wraps(func)
+    def wrapper(*args, **kw):
+        if current_user.is_authenticated:
+            g.mesg_count = current_user.message_received.count()
+        return func(*args, **kw)
+    return wrapper
+
+
+
 
 @main.route('/')
 @login_required
+@get_msg_count
 def index():
     if current_user.role.name != 'visitor':
         return redirect(url_for('manage.index'))

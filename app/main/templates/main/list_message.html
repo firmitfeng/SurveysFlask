@@ -1,0 +1,57 @@
+{% extends "main/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "main/_macros.html" as macros %}
+
+{% block main_body %}
+<table class="table table-condensed table-striped table-hover row">
+  <thead>
+    <tr>
+      <th>主题</th>
+      <th class="col-md-1">发件人</th>
+      <th class="col-md-1">收件人</th>
+      <th class="col-md-1">发件时间</th>
+      <th class="col-md-1">已读</th>
+      <th class="col-md-1">操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for message in messages %}
+    <tr message_id={{message.id}}>
+      <td><span title="{{message.subject}}">{{message.subject | truncate(35, True)}}</span></td>
+      <td>{{message.sender.name}}</td>
+      <td>{{message.receiver.name}}</td>
+      <td>{{message.ctime.strftime('%Y-%m-%d %H:%M')}}</td>
+      <td>{{message.is_read}}</td>
+      <td>操作</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="center-block margin-blank-5">
+  {{ macros.pagination_widget(pagination, 'main.listMessage') }}
+</div>
+
+{% include 'main/modal.html' %} 
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+jQuery( document ).ready(function(){
+  jQuery('a.delete').each(function(){
+    jQuery(this).click(function(){
+        var url = jQuery(this).attr("url-target");
+        jQuery('div.modal-body').empty().html('<p><strong>此操作无法恢复！确定删除？</strong></p>');
+        jQuery('div.modal-content').addClass('alert alert-danger');
+        jQuery('div.modal-footer #subBtn').addClass('btn-danger').click(function(){
+          window.location.href=url;
+          //console.log(url);
+        });
+        jQuery('div#infoModal').modal('show');
+    });
+  });
+}); 
+</script>
+{% endblock %}

@@ -12,5 +12,4 @@ main = Blueprint(
 
 
 #import views
-from . import views, survey, errors
-
+from . import views, survey, message, errors

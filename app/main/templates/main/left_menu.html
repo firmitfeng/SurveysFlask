@@ -28,19 +28,19 @@
       </div>
     </div>
   </div>
-  <div class="panel panel-default {{userManage}}">
-    <div class="panel-heading" role="tab" id="userManageHead">
+  <div class="panel panel-default {{mesgManage}}">
+    <div class="panel-heading" role="tab" id="mesgManageHead">
       <h4 class="panel-title">
-          <a role="button" data-toggle="collapse" data-parent="#leftMenu" href="#userManage" aria-expanded="{%- if userManage %}true{% else %}false{% endif -%}" aria-controls="userManage">消息管理</a>
+          <a role="button" data-toggle="collapse" data-parent="#leftMenu" href="#mesgManage" aria-expanded="{%- if mesgManage %}true{% else %}false{% endif -%}" aria-controls="mesgManage">消息管理<span class="badge pull-right">{{current_user.message_received.filter_by(is_read=0).count()}}</span></a>
       </h4>
     </div>
-{#    <div id="userManage" class="panel-collapse collapse {% if userManage %}in{% endif -%}" role="tabpanel" aria-labelledby="userManageHead">
+    <div id="mesgManage" class="panel-collapse collapse {% if mesgManage %}in{% endif -%}" role="tabpanel" aria-labelledby="mesgManageHead">
       <div class="panel-body">
-        <ul class="nav">
-          <li><a href="#">查看消息</a></li>
-          <li><a href="#">发送消息</a></li>
+       <ul class="nav">
+          <li><a href="{{ url_for('main.listMessage') }}">查看消息</a></li>
+          <li><a href="{{ url_for('main.sendMessage') }}">发送消息</a></li>
         </ul>
-      </div> #}
+      </div> 
     </div>
   </div>
 </div>

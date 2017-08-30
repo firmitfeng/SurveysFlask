@@ -316,6 +316,7 @@ class SurveyResult(db.Model):
 
 
 class Message(db.Model):
+    ''' 记录系统用户间、用户用户间发送的消息 '''
     __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(255))
@@ -352,24 +353,26 @@ class Message(db.Model):
 
 
 class Archive(db.Model):
+    ''' 咨询师对来访者的记录、评价等；记录督导师对咨询师的评价 '''
     __tablename__ = 'archives'
     id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200))
     content = db.Column(db.Text)
     keywords = db.Column(db.String(200))
     type = db.Column(db.String(64))
     ctime = db.Column(db.DateTime, default=datetime.now())
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    object_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    target_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     author = db.relationship('User',
                             primaryjoin = "Archive.author_id == User.id",
                             backref=db.backref("estimates", lazy='dynamic')
                             )
-    object = db.relationship('User',
-                            primaryjoin = "Archive.object_id == User.id",
+    target = db.relationship('User',
+                            primaryjoin = "Archive.target_id == User.id",
                             backref=db.backref("records", lazy='dynamic')
                             )
 
     def __repr__(self):
-        return '<Archive author:{} object:{}'.format(self.author_id, self.object_id)
-
+        return '<Archive title:{} author:{} target:{}>'\
+                .format(self.title, self.author_id, self.target_id)
 

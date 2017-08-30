@@ -3,7 +3,7 @@ from flask_wtf import Form
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import StringField, PasswordField, BooleanField, \
         RadioField, TextAreaField, SubmitField, SelectField, HiddenField, \
-        DateField, DateTimeField
+        DateField, DateTimeField, SelectMultipleField
 from wtforms.widgets import TextArea, CheckboxInput, ListWidget, RadioInput
 from wtforms.validators import InputRequired, Length, Email, Regexp, EqualTo, DataRequired
 from wtforms import ValidationError
@@ -60,4 +60,15 @@ class SurveyBaseForm(Form):
     def append_field(cls, name, field):
         setattr(cls, name, field)
         return cls
+
+
+class MessageForm(Form):
+    to_user = SelectField(u'收件人', coerce=int, choices=[])
+    subject = StringField(u'主题', validators=[DataRequired()],
+                            render_kw={'placeholder': u'请输入主题'})
+    content = TextAreaField(u'内容', widget=TextArea(), \
+                            render_kw={'class': 'text-body', 'rows': 20})
+
+    from_user = HiddenField('user_id')
+    submit = SubmitField(u'发送')
 

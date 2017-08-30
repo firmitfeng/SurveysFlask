@@ -1,0 +1,68 @@
+{% extends "manage/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "main/_macros.html" as macros %}
+
+{% block main_body %}
+<table class="table table-condensed table-striped table-hover row">
+  <thead>
+    <tr>
+      <th width="40px">#</th>
+      <th>标题</th>
+      <th class="col-md-1">用户</th>
+      <th class="col-md-1">编写人</th>
+      <th class="col-md-1">添加时间</th>
+      <th class="col-md-1">操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for archive in archives %}
+    <tr archive_id={{archive.id}}>
+      <td></td>
+      <td><span title="{{archive.title}}">{{archive.title | truncate(35, True)}}</span></td>
+      <td>{{archive.target.name}}</td>
+      <td>{{archive.author.name}}</td>
+      <td>{{archive.ctime.strftime('%Y-%m-%d')}}</td>
+      <td>
+        <div class="btn-group">
+          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 操作 <span class="caret"></span></button>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li><a href="{{ url_for('manage.displayArchive', archive_id=archive.id) }}" class="" role="button">详情</a></li>
+            <li><a href="{{ url_for('manage.editArchive', archive_id=archive.id, user_id=user_id) }}" class="" role="button">编辑</a></li>
+            {% if current_user.is_administrator() %}
+            <li><a href="#" url-target="{{ url_for('manage.delArchive', archive_id=archive.id, user_id=user_id) }}" class="delete" role="button">删除</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="center-block margin-blank-5">
+  {{ macros.pagination_widget(pagination, 'manage.listArchives', user_id=user_id) }}
+</div>
+
+{% include 'manage/modal.html' %} 
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+jQuery( document ).ready(function(){
+  jQuery('a.delete').each(function(){
+    jQuery(this).click(function(){
+        var url = jQuery(this).attr("url-target");
+        jQuery('div.modal-body').html('<p><strong>此操作无法恢复！确定删除？</strong></p>');
+        jQuery('div.modal-content').addClass('alert alert-danger');
+        jQuery('div.modal-footer #subBtn').addClass('btn-danger').click(function(){
+          window.location.href=url;
+          //console.log(url);
+        });
+        jQuery('div#infoModal').modal('show');
+    });
+  });
+}); 
+</script>
+{% endblock %}

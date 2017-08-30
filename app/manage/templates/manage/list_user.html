@@ -25,18 +25,24 @@
       <td>
           <div class="btn-group">
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 操作 <span class="caret"></span></button>
-             <ul class="dropdown-menu">
-               <li><a href="{{ url_for('manage.editUser', user_id=user.id) }}" class="" role="button">编辑</a></li>
+             <ul class="dropdown-menu dropdown-menu-right">
               {%- if current_user.is_administrator() %}
+              <li><a href="{{ url_for('manage.editUser', user_id=user.id) }}" class="" role="button">编辑</a></li>
               <li><a href="#" url-target="{{ url_for('manage.delUser', user_id=user.id) }}" class="delete" role="button">删除</a></li>
+              <li role="separator" class="divider"></li>
+              {% endif -%}
+              {%- if not user.is_administrator() %}
+              <li><a href="#" url-target="{{ url_for('manage.distributeSurvey', user_id=user.id) }}" class="dis-survey" role="button">分发问卷</a></li>
+              {% endif -%}
+              {%- if user.role.name == 'visitor'%}
+              <li><a href="{{ url_for('manage.dispUserSurveyResult', user_id=user.id) }}" class="" role="button">查看问卷结果</a></li>
               {% endif -%}
               {%- if not user.is_administrator() %}
               <li role="separator" class="divider"></li>
-              <li><a href="#" url-target="{{ url_for('manage.distributeSurvey', user_id=user.id) }}" class="dis-survey" role="button">分发问卷</a></li>
+              <li><a href="{{ url_for('manage.listArchives', user_id=user.id)}}">查看记录</a></li>
+              <li><a href="{{ url_for('manage.addArchive', user_id=user.id)}}">添加记录</a></li>
               {% endif -%}
-              {%- if user.role.name == 'visitor' %}
-              <li><a href="{{ url_for('manage.dispUserSurveyResult', user_id=user.id) }}" class="" role="button">查看问卷结果</a></li>
-              {% endif -%}
+
               {#- if current_user.is_administrator() %}
               <li role="separator" class="divider"></li>
               <li><a href="#" class="" role="button">查看往来信息</a></li>

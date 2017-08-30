@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint
+from flask import Blueprint, g
 
 manage = Blueprint(
         'manage',
@@ -12,5 +12,4 @@ manage = Blueprint(
 
 
 #import views
-from . import views, user, survey, errors
-
+from . import views, user, survey, archive, errors

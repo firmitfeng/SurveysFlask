@@ -24,7 +24,7 @@
       <td>
         <div class="btn-group">
           <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">操作</button>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu dropdown-menu-right">
             <li><a href="{{ url_for('manage.editSurvey', survey_id=survey.id) }}" class="" role="button">编辑</a></li>
             <li><a href="{{ url_for('manage.previewSurvey', survey_id=survey.id) }}" class="" target="_blank" role="button">预览</a></li>
             {% if current_user.is_administrator() %}

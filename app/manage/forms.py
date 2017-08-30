@@ -87,3 +87,17 @@ class distribPsychoForm(Form):
 class distribSupervisorForm(Form):
     user_id = HiddenField(u'user_id')
     uppers = LabelRadioField(u'选择督导师', coerce=int, choices=[])
+
+
+class addArchiveForm(Form):
+    title = StringField(u'标题', render_kw={'placeholder': u'请输入标题'})
+    content = TextAreaField(u'内容', widget=TextArea(), \
+                            render_kw={'class': 'text-body', 'rows': 20})
+    keywords = StringField(u'关键词', render_kw={'placeholder': u'请输入关键词'})
+
+    to_user_id = HiddenField(u'to_user_id')
+    submit = SubmitField(u'提交')
+
+
+class editArchiveForm(addArchiveForm):
+    archive_id = HiddenField(u'archive_id')
