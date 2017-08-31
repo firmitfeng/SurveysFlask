@@ -32,27 +32,4 @@
 <div class="center-block margin-blank-5">
   {{ macros.pagination_widget(pagination, 'manage.listSurvey') }}
 </div>
-
-{% include 'main/modal.html' %} 
-
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
-<script>
-jQuery( document ).ready(function(){
-  jQuery('a.delete').each(function(){
-    jQuery(this).click(function(){
-        var url = jQuery(this).attr("url-target");
-        jQuery('div.modal-body').empty().html('<p><strong>此操作无法恢复！确定删除？</strong></p>');
-        jQuery('div.modal-content').addClass('alert alert-danger');
-        jQuery('div.modal-footer #subBtn').addClass('btn-danger').click(function(){
-          window.location.href=url;
-          //console.log(url);
-        });
-        jQuery('div#infoModal').modal('show');
-    });
-  });
-}); 
-</script>
 {% endblock %}

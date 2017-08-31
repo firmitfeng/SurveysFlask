@@ -4,6 +4,17 @@
 
 {% block main_body %}
 <div class="well">
+  <h4><strong>主题：</strong>{{message.subject}}</h4>
+  <p><strong>发件人：</strong>{{message.sender.name}}</p>
+  <p><strong>收件人：</strong>{{message.receiver.name}}</p>
+  <p><strong>发送时间：</strong>{{message.ctime.strftime('%Y-%m-%d %H:%M')}}</p>
+  <hr>
+  <div>{{message.content | safe}}</div>
+</div>
+{% if form %}
+<div class="well">
+<h4>回复消息</h4>
+<hr>
 <form action="" method="post" class="form form-horizontal" role="form">
   {{ form.hidden_tag() }}
 
@@ -17,16 +28,23 @@
     {%- endfor %}
   {%- endif %}
 
-  {{ form_macro.form_field(form.to_user, form_type="horizontal", horizontal_columns=('lg', 1, 10)) }}
+  {{ form_macro.form_field(form.to_user, form_type="horizontal", horizontal_columns=('lg', 1, 10), readonly="readonly") }}
   {{ form_macro.form_field(form.subject, form_type="horizontal", horizontal_columns=('lg', 1, 10)) }}
   {{ form_macro.form_field(form.content, form_type="horizontal", horizontal_columns=('lg', 1, 10)) }}
-  {{ form_macro.form_field(form.submit, form_type="horizontal", horizontal_columns=('lg', 1, 2), button_map={'submit':'primary btn-lg btn-block'}) }}
+  <div class="form-group">
+    <div class="col-lg-offset-1 col-lg-2"><input class="btn btn-primary btn-lg btn-block" id="submit" name="submit" type="submit" value="发送"></div>
+    <div class="col-lg-1"><a href="{{prev}}" class="btn btn-primary btn-lg btn-block">返回</a></div>
+  </div>
 </form>
 </div>
+{% else %}
+<div class="center-block"><a href="{{prev}}" class="btn btn-primary btn-lg">返回</a></div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
+{% if form %}
   <script src="{{ url_for('manage.static', filename='js/ckeditor/ckeditor.js') }}"></script>
   <script>
 CKEDITOR.replace('content',{
@@ -48,5 +66,5 @@ CKEDITOR.replace('content',{
       removeButtons: 'Superscript,Paste,PasteText,PasteFromWord,Scayt,Unlink,Anchor,Table,HorizontalRule,SpecialChar,Maximize,Source,RemoveFormat,Strike,Subscript,Outdent,Indent,Styles,Format,About,Image'
 });
   </script>
+{% endif %}
 {% endblock %}
-

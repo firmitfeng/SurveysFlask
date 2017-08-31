@@ -89,7 +89,7 @@ class Relation(db.Model):
     #管理员的ID
     upper_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     type = db.Column(db.String(64))
-    ctime = db.Column(db.DateTime, default=datetime.utcnow)
+    ctime = db.Column(db.DateTime, default=datetime.now)
 
     def __repr__(self):
         return '<upper id %r, lower id %r>' % \
@@ -102,7 +102,7 @@ class Distribute(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'), primary_key=True)
     type = db.Column(db.String(64))
-    ctime = db.Column(db.DateTime, default=datetime.utcnow)
+    ctime = db.Column(db.DateTime, default=datetime.now)
 
     def __repr__(self):
         return '<survey: {}, user: {}>'.format(self.survey_id, self.user_id)
@@ -316,14 +316,18 @@ class SurveyResult(db.Model):
 
 
 class Message(db.Model):
-    ''' 记录系统用户间、用户用户间发送的消息 '''
+    ''' 记录系统用户间、用户用户间发送的消息 
+        其中，root记录同一主题的mesg；parent记录回复mesg
+    '''
     __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
+    serial_num = db.Column(db.String(128), index=True)
     subject = db.Column(db.String(255))
     content = db.Column(db.Text)
     type = db.Column(db.String(64))
     ctime = db.Column(db.DateTime, default=datetime.now())
-    is_read = db.Column(db.SmallInteger, default=0)
+    #is_read = db.Column(db.SmallInteger, default=0)
+    is_read = db.Column(db.DateTime, default=0)
     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     sender = db.relationship('User',
@@ -334,22 +338,39 @@ class Message(db.Model):
                               primaryjoin = "Message.receiver_id == User.id",
                               backref=db.backref("message_received", lazy='dynamic')
                               )
-    #root_id = db.Column(db.Integer, db.ForeignKey('messages.id'))
-    #root = db.relationship('Message',
-    #                        remote_side=[id],
-    #                        backref=db.backref('leafs', remote_side=[root_id], lazy='dynamic')
-    #                        )
+    root_id = db.Column(db.Integer, db.ForeignKey('messages.id'))
+    leafs = db.relationship('Message',
+                            foreign_keys=[root_id],
+                            backref=db.backref('root', remote_side=[id]),
+                            lazy='dynamic',
+                            post_update=True
+                            )
     parent_id = db.Column(db.Integer, db.ForeignKey('messages.id'))
     children = db.relationship('Message',
+                                foreign_keys=[parent_id],
                                 backref=db.backref('parent', remote_side=[id]),
-                                lazy='dynamic'
+                                lazy='dynamic',
+                                post_update=True
                               )
-    sender_deled = db.Column(db.SmallInteger, default=0)
-    receiver_deled = db.Column(db.SmallInteger, default=0)
-   
+    sender_deled = db.Column(db.DateTime, default=0)
+    receiver_deled = db.Column(db.DateTime, default=0)
+
+    def __init__(self, **kwargs):
+        super(Message, self).__init__(**kwargs)
+        if self.subject is not None:
+            self.serial_num = encodeSerialNum(self.subject)
+
+    @staticmethod
+    def on_changed_subject(target, value, oldvalue, initiator):
+        value = "".join(value.split())
+        if target.serial_num is None:
+            target.serial_num = encodeSerialNum(value)
+
     def __repr__(self):
         return '<Message sender:{} receiver:{} subject:{}>'\
                     .format(self.sender_id, self.receiver_id, self.subject)
+
+db.event.listen(Message.subject, 'set', Message.on_changed_subject)
 
 
 class Archive(db.Model):

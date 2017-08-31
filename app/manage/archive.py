@@ -70,7 +70,8 @@ def displayArchive(archive_id):
             flash(u'权限不足')
             return redirect(url_for('manage.listUser'))
     return render_template('manage/disp_archive.html',
-                            archive=archive
+                            archive=archive,
+                            userManage='active'
                             )
 
 

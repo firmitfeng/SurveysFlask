@@ -11,5 +11,5 @@
 {{archive.content | safe}}
 <hr>
 <p class="pull-right">{{archive.ctime}}</p>
-<p style="padding:15px 0; text-align:center;"><a href="{{url_for('manage.listArchives', user_id=archive.target_id) }}" class="btn btn-primary">返回</a></p>
+<p style="padding:15px 0; text-align:center;"><a href="{{url_for('manage.listArchives', user_id=archive.target_id) }}" class="btn btn-primary btn-lg">返回</a></p>
 {% endblock %}

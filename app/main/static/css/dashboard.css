@@ -69,6 +69,9 @@ body {
 .sidebar #leftMenu .panel-body li{
   border-bottom: solid 1px #EEE;
 }
+table tr.mesg-unread{
+  font-weight: bold;
+}
 #infoModal div.radio{
   max-height:200px;
   overflow:hidden;

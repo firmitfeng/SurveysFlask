@@ -31,7 +31,7 @@
   <div class="panel panel-default {{mesgManage}}">
     <div class="panel-heading" role="tab" id="mesgManageHead">
       <h4 class="panel-title">
-          <a role="button" data-toggle="collapse" data-parent="#leftMenu" href="#mesgManage" aria-expanded="{%- if mesgManage %}true{% else %}false{% endif -%}" aria-controls="mesgManage">消息管理<span class="badge pull-right">{{current_user.message_received.filter_by(is_read=0).count()}}</span></a>
+          <a role="button" data-toggle="collapse" data-parent="#leftMenu" href="#mesgManage" aria-expanded="{%- if mesgManage %}true{% else %}false{% endif -%}" aria-controls="mesgManage">消息管理<span class="badge pull-right">{{current_user.message_received.filter_by(is_read=0).filter_by(receiver_deled=0).count()}}</span></a>
       </h4>
     </div>
     <div id="mesgManage" class="panel-collapse collapse {% if mesgManage %}in{% endif -%}" role="tabpanel" aria-labelledby="mesgManageHead">

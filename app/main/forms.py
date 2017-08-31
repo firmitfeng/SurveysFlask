@@ -68,7 +68,8 @@ class MessageForm(Form):
                             render_kw={'placeholder': u'请输入主题'})
     content = TextAreaField(u'内容', widget=TextArea(), \
                             render_kw={'class': 'text-body', 'rows': 20})
-
-    from_user = HiddenField('user_id')
     submit = SubmitField(u'发送')
 
+
+class ReplyMessageForm(MessageForm):
+    mesg_id = HiddenField(u'mesg_id')

@@ -18,7 +18,7 @@
     {% for archive in archives %}
     <tr archive_id={{archive.id}}>
       <td></td>
-      <td><span title="{{archive.title}}">{{archive.title | truncate(35, True)}}</span></td>
+      <td><a href="{{ url_for('manage.displayArchive', archive_id=archive.id) }}"><span title="{{archive.title}}">{{archive.title | truncate(35, True)}}</span></a></td>
       <td>{{archive.target.name}}</td>
       <td>{{archive.author.name}}</td>
       <td>{{archive.ctime.strftime('%Y-%m-%d')}}</td>
