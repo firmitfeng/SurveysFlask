@@ -30,6 +30,8 @@ def getDayBeforeN(days=30):
 @main.route('/list-messages/<path:path>', methods=['GET'])
 @login_required
 def listMessage(path):
+    if current_user.is_administrator():
+        return redirect(url_for('manage.listMessage'))
     page = request.args.get('page', 1, type=int)
     if path == 'in':
         pagination = Message.query\
@@ -74,13 +76,13 @@ def readMessage(serial_num):
             and not current_user.is_administrator():
         return abort(404)
 
+    if not mesg.is_read and mesg.receiver_id == current_user.id :
+        mesg.is_read = datetime.datetime.now()
+        db.session.add(mesg)
+        db.session.commit()
+
     form = None
     if mesg.receiver_id == current_user.id and mesg.type != MesgType.SYSTEM :
-        if not mesg.is_read:
-            mesg.is_read = datetime.datetime.now()
-            db.session.add(mesg)
-            db.session.commit()
-
         form = ReplyMessageForm()
         form.to_user.choices = [(mesg.sender_id, mesg.sender.name)]
         form.to_user.data = mesg.sender_id

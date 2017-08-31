@@ -12,4 +12,4 @@ manage = Blueprint(
 
 
 #import views
-from . import views, user, survey, archive, errors
+from . import views, user, survey, archive, message, errors

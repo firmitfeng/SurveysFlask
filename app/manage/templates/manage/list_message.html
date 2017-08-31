@@ -1,17 +1,16 @@
-{% extends "main/base.html" %}
+{% extends "manage/base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
-{% import "main/_macros.html" as macros %}
+{% import "manage/_macros.html" as macros %}
 
 {% block main_body %}
 <ul class="nav nav-pills">
-  <li role="presentation" {% if not path or path == 'in' %}class="active"{% endif %}><a href="{{url_for('main.listMessage')}}">收件箱</a></li>
-  <li role="presentation" {% if path == 'out' %}class="active"{% endif %}><a href="{{url_for('main.listMessage', path='out')}}">发件箱</a></li>
-  <li role="presentation" {% if path == 'del' %}class="active"{% endif %}><a href="{{url_for('main.listMessage', path='del')}}">已删除</a></li>
+  <li role="presentation" {% if not path %}class="active"{% endif %}><a href="{{url_for('manage.listMessage')}}">所有信息</a></li>
+  <li role="presentation" {% if path == 'out' %}class="active"{% endif %}><a href="{{url_for('manage.listMessage', path='out')}}">发件箱</a></li>
 </ul>
 
 {% block mesg_table %}{% endblock %}
 
-{% include 'main/modal.html' %} 
+{% include 'manage/modal.html' %} 
 
 {% endblock %}
 
@@ -22,7 +21,7 @@ jQuery( document ).ready(function(){
   jQuery('a.delete').each(function(){
     jQuery(this).click(function(){
         var url = jQuery(this).attr("url-target");
-        jQuery('div.modal-body').empty().html('<p><strong>此操作可能无法恢复！确定删除？</strong></p>');
+        jQuery('div.modal-body').empty().html('<p><strong>此操作无法恢复！确定删除？</strong></p>');
         jQuery('div.modal-content').addClass('alert alert-danger');
         jQuery('div.modal-footer #subBtn').addClass('btn-danger').click(function(){
           window.location.href=url;
